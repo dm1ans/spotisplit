@@ -10,6 +10,7 @@
 <style>
 body { margin:0; background:#0a0a0a; color:#eaeaea; font-family:DM Mono; }
 .app { max-width:1100px; margin:auto; padding:40px; }
+
 h1 { font-family:Bebas Neue; font-size:64px; }
 
 .panel { background:#111; padding:20px; border:1px solid #222; margin-bottom:20px; }
@@ -22,20 +23,43 @@ button {
   margin-top:10px;
 }
 
+.progress {
+  margin:10px 0;
+  font-size:12px;
+  color:#aaa;
+}
+
+/* GRID */
 .grid {
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:10px;
 }
 
+/* CARD */
 .card {
   background:#111;
   padding:12px;
   border:1px solid #222;
+  min-height:60px;
 }
 
-.small { font-size:12px; color:#888; }
+/* SKELETON */
+.skeleton {
+  background:linear-gradient(90deg,#111,#1a1a1a,#111);
+  background-size:200% 100%;
+  animation:shimmer 1.2s infinite;
+  height:14px;
+  margin:6px 0;
+  border-radius:4px;
+}
 
+@keyframes shimmer {
+  0% { background-position:200% 0; }
+  100% { background-position:-200% 0; }
+}
+
+/* BAR */
 .bar {
   height:6px;
   background:#222;
@@ -50,10 +74,19 @@ button {
   transition:width .3s;
 }
 
-.progress {
-  margin:10px 0;
+/* COUNTER */
+.counter {
+  display:flex;
+  gap:10px;
+  margin:15px 0;
+  flex-wrap:wrap;
+}
+
+.counter div {
   font-size:12px;
-  color:#aaa;
+  padding:6px 10px;
+  border:1px solid #222;
+  background:#111;
 }
 </style>
 </head>
@@ -78,6 +111,14 @@ button {
 
   <div class="progress" id="progressText"></div>
 
+  <!-- COUNTERS LIVE -->
+  <div class="counter" id="counter">
+    <div>Mujer: 0</div>
+    <div>Hombre: 0</div>
+    <div>Grupo: 0</div>
+    <div>Unknown: 0</div>
+  </div>
+
   <div class="grid" id="results"></div>
 
 </div>
@@ -87,13 +128,23 @@ button {
 <script>
 
 /* =========================
-   STATE + CACHE
+   STATE
 ========================= */
 
 const state = {
   token: null,
-  cache: new Map()
+  cache: new Map(),
+  counts: {
+    female:0,
+    male:0,
+    group:0,
+    unknown:0
+  }
 };
+
+/* =========================
+   CACHE PERSISTENTE
+========================= */
 
 function loadCache() {
   try {
@@ -112,7 +163,7 @@ function saveCache() {
 loadCache();
 
 /* =========================
-   LOGIN SPOTIFY
+   LOGIN
 ========================= */
 
 function login() {
@@ -132,13 +183,15 @@ function login() {
 }
 
 /* =========================
-   TOKEN HANDLER
+   TOKEN
 ========================= */
 
 window.onload = () => {
+
   const hash = location.hash;
 
   if (hash.includes("access_token")) {
+
     state.token = new URLSearchParams(hash.substring(1)).get("access_token");
 
     document.getElementById("dashboard").style.display = "block";
@@ -147,7 +200,7 @@ window.onload = () => {
   }
 };
 
-function setStatus(t) {
+function setStatus(t){
   document.getElementById("status").innerText = t;
 }
 
@@ -164,28 +217,60 @@ async function api(path) {
 }
 
 /* =========================
-   MAIN ANALYSIS
+   ANALYSIS
 ========================= */
 
 async function analyze(range) {
+
+  state.counts = { female:0, male:0, group:0, unknown:0 };
+
+  updateCounter();
+
+  document.getElementById("results").innerHTML = "";
+
+  showSkeleton(12);
 
   const data = await api(`/me/top/artists?limit=50&time_range=${range}`);
 
   const list = data.items.map(a => a.name);
 
-  document.getElementById("results").innerHTML = "";
-
   await classifyIncremental(list);
 }
 
 /* =========================
-   INCREMENTAL CLASSIFICATION
+   SKELETON UI
+========================= */
+
+function showSkeleton(n) {
+
+  const el = document.getElementById("results");
+  el.innerHTML = "";
+
+  for (let i=0;i<n;i++) {
+
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <div class="skeleton" style="width:70%"></div>
+      <div class="skeleton" style="width:40%"></div>
+      <div class="skeleton" style="width:90%"></div>
+    `;
+
+    el.appendChild(div);
+  }
+}
+
+/* =========================
+   INCREMENTAL PIPELINE
 ========================= */
 
 async function classifyIncremental(list) {
 
   const concurrency = 6;
   let index = 0;
+
+  document.getElementById("results").innerHTML = "";
 
   async function worker() {
 
@@ -198,7 +283,13 @@ async function classifyIncremental(list) {
 
       const gender = await classify(name);
 
+      state.counts[gender]++;
+
+      updateCounter();
+
       renderOne({ name, gender });
+
+      await new Promise(r => requestAnimationFrame(r));
     }
   }
 
@@ -210,7 +301,7 @@ async function classifyIncremental(list) {
 }
 
 /* =========================
-   CLASSIFY PIPELINE
+   CLASSIFY
 ========================= */
 
 async function classify(name) {
@@ -249,7 +340,7 @@ async function musicbrainz(name) {
 
     const d = await r.json();
 
-    await wait(1000);
+    await wait(900);
 
     const a = d.artists?.[0];
 
@@ -267,14 +358,14 @@ async function musicbrainz(name) {
 }
 
 /* =========================
-   FALLBACK SPOTIFY
+   FALLBACK
 ========================= */
 
 function spotifyFallback(name) {
 
   const n = name.toLowerCase();
 
-  const female = ["billie","adele","rihanna","beyonce","rosalia"];
+  const female = ["billie","adele","rihanna","rosalia","beyonce"];
   const male = ["drake","eminem","kendrick","kanye","post"];
 
   if (female.some(x => n.includes(x))) return "female";
@@ -301,6 +392,22 @@ function renderOne(item) {
   `;
 
   el.appendChild(div);
+}
+
+/* =========================
+   COUNTER LIVE
+========================= */
+
+function updateCounter() {
+
+  const c = state.counts;
+
+  document.getElementById("counter").innerHTML = `
+    <div>Mujer: ${c.female}</div>
+    <div>Hombre: ${c.male}</div>
+    <div>Grupo: ${c.group}</div>
+    <div>Unknown: ${c.unknown}</div>
+  `;
 }
 
 /* =========================
