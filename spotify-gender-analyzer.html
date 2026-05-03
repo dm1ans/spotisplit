@@ -1,29 +1,42 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Gender Split Fast FIX</title>
+<title>Gender Split Fix v10</title>
 
 <style>
-body{margin:0;background:#0a0a0a;color:#eee;font-family:system-ui}
-.app{max-width:900px;margin:auto;padding:30px}
-button{padding:10px;margin:5px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.card{background:#111;padding:10px;border:1px solid #222}
-.counter{display:flex;gap:10px;margin:10px 0;flex-wrap:wrap}
-.counter div{padding:6px 10px;border:1px solid #222}
-.small{font-size:12px;opacity:.7}
+body { margin:0; background:#0a0a0a; color:#eee; font-family:system-ui; }
+.app { max-width:900px; margin:auto; padding:30px; }
+
+h2 { margin-bottom:10px; }
+
+input { width:100%; padding:10px; margin-bottom:10px; }
+
+button { padding:10px; margin:5px 0; cursor:pointer; }
+
+.grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+
+.card { background:#111; border:1px solid #222; padding:10px; }
+
+.counter { display:flex; gap:10px; flex-wrap:wrap; margin:10px 0; }
+
+.counter div { border:1px solid #222; padding:6px 10px; }
+
+.small { font-size:12px; opacity:.7; }
 </style>
 </head>
 
 <body>
+
 <div class="app">
 
-<h2>Gender Split FIX</h2>
+<h2>Gender Split Fix v10</h2>
 
 <input id="client" placeholder="Spotify Client ID"/>
-<button onclick="login()">Login</button>
+<button onclick="login()">Login Spotify</button>
+
+<div id="status"></div>
 
 <div id="dash" style="display:none">
 
@@ -43,99 +56,110 @@ button{padding:10px;margin:5px}
 /* ================= STATE ================= */
 
 const state = {
-  token:null,
-  cache:new Map(),
-  counts:{female:0,male:0,group:0,unknown:0}
+  token: null,
+  cache: new Map(),
+  counts: { female:0, male:0, group:0, unknown:0 }
 };
 
-/* ================= CACHE ================= */
+/* ================= CONFIG FIJA ================= */
 
-(function load(){
-  try{
-    const c = localStorage.getItem("cache");
-    if(c) state.cache = new Map(JSON.parse(c));
-  }catch{}
-})();
+const REDIRECT_URI = "https://dm1ans.github.io/spotisplit/spotify-gender-analyzer.html";
 
-function save(){
-  localStorage.setItem("cache", JSON.stringify([...state.cache]));
+/* ================= HELPERS PKCE ================= */
+
+function randomString(len){
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return btoa(String.fromCharCode(...arr))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')
+    .slice(0,len);
+}
+
+async function sha256(str){
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
 
 /* ================= LOGIN ================= */
 
 async function login(){
 
-  const cid = document.getElementById("client").value;
+  const cid = document.getElementById("client").value.trim();
+  if(!cid) return alert("Falta Client ID");
+
   localStorage.setItem("cid",cid);
 
-  const verifier = cryptoRandom();
-  const challenge = await sha256(verifier);
-
+  const verifier = randomString(64);
   localStorage.setItem("verifier",verifier);
 
-  const redirect = location.href.split("?")[0];
+  const challenge = await sha256(verifier);
 
   const url =
-  "https://accounts.spotify.com/authorize" +
-  "?client_id=" + cid +
-  "&response_type=code" +
-  "&redirect_uri=" + encodeURIComponent(redirect) +
-  "&scope=user-top-read user-library-read" +
-  "&code_challenge_method=S256" +
-  "&code_challenge=" + challenge;
+    "https://accounts.spotify.com/authorize" +
+    "?client_id=" + cid +
+    "&response_type=code" +
+    "&redirect_uri=" + encodeURIComponent(REDIRECT_URI) +
+    "&scope=user-top-read user-library-read" +
+    "&code_challenge_method=S256" +
+    "&code_challenge=" + challenge;
 
   location.href = url;
 }
 
-/* ================= TOKEN EXCHANGE (FIX REAL) ================= */
+/* ================= CALLBACK ================= */
 
 window.onload = async () => {
 
   const code = new URLSearchParams(location.search).get("code");
 
-  if(code){
+  if(!code) return;
 
-    const cid = localStorage.getItem("cid");
-    const verifier = localStorage.getItem("verifier");
+  const cid = localStorage.getItem("cid");
+  const verifier = localStorage.getItem("verifier");
 
-    const body = new URLSearchParams({
-      client_id: cid,
-      grant_type: "authorization_code",
-      code,
-      redirect_uri: location.href.split("?")[0],
-      code_verifier: verifier
-    });
+  const body = new URLSearchParams({
+    client_id: cid,
+    grant_type: "authorization_code",
+    code,
+    redirect_uri: REDIRECT_URI,
+    code_verifier: verifier
+  });
 
-    const r = await fetch("https://accounts.spotify.com/api/token", {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/x-www-form-urlencoded"
-      },
-      body
-    });
+  const r = await fetch("https://accounts.spotify.com/api/token", {
+    method:"POST",
+    headers: {
+      "Content-Type":"application/x-www-form-urlencoded"
+    },
+    body
+  });
 
-    const d = await r.json();
+  const data = await r.json();
 
-    if(!d.access_token){
-      alert("Error login Spotify");
-      console.log(d);
-      return;
-    }
+  console.log("AUTH:", data);
 
-    state.token = d.access_token;
-
-    history.replaceState({},document.title,location.pathname);
-
-    document.getElementById("dash").style.display="block";
+  if(!data.access_token){
+    document.getElementById("status").innerText =
+      "Error login Spotify (mirar consola)";
+    return;
   }
+
+  state.token = data.access_token;
+
+  history.replaceState({},document.title,location.pathname);
+
+  document.getElementById("dash").style.display="block";
+  document.getElementById("status").innerText="Conectado";
 };
 
 /* ================= API ================= */
 
 async function api(url){
   const r = await fetch("https://api.spotify.com/v1"+url,{
-    headers:{Authorization:"Bearer "+state.token}
+    headers:{ Authorization:"Bearer "+state.token }
   });
+
   return r.json();
 }
 
@@ -143,22 +167,15 @@ async function api(url){
 
 async function run(range){
 
-  state.counts={female:0,male:0,group:0,unknown:0};
+  state.counts = {female:0,male:0,group:0,unknown:0};
 
   document.getElementById("grid").innerHTML="";
 
   const data = await api(`/me/top/artists?limit=50&time_range=${range}`);
 
-  await process(data.items);
-}
+  for(const a of data.items){
 
-/* ================= PROCESS ================= */
-
-async function process(list){
-
-  for(const a of list){
-
-    const g = await classify(a.name);
+    const g = classify(a.name);
 
     state.counts[g]++;
 
@@ -166,62 +183,16 @@ async function process(list){
 
     update();
   }
-
-  save();
 }
 
 /* ================= CLASSIFY ================= */
 
-async function classify(name){
+function classify(name){
 
-  const k = name.toLowerCase();
-
-  if(state.cache.has(k)) return state.cache.get(k);
-
-  let g = guess(name);
-
-  if(g==="unknown") g = await mb(name);
-
-  state.cache.set(k,g);
-
-  return g;
-}
-
-/* ================= MUSICBRAINZ ================= */
-
-async function mb(name){
-
-  try{
-
-    const r = await fetch(
-      `https://musicbrainz.org/ws/2/artist?query=${encodeURIComponent(name)}&fmt=json&limit=1`
-    );
-
-    const d = await r.json();
-
-    const a = d.artists?.[0];
-
-    if(!a) return "unknown";
-
-    if(a.type==="Group") return "group";
-    if(a.gender==="female") return "female";
-    if(a.gender==="male") return "male";
-
-    return "unknown";
-
-  }catch{
-    return "unknown";
-  }
-}
-
-/* ================= FAST GUESS ================= */
-
-function guess(n){
-
-  n = n.toLowerCase();
+  const n = name.toLowerCase();
 
   const f = ["billie","adele","rihanna","rosalia","dua","sza"];
-  const m = ["drake","eminem","kendrick","kanye","post","travis"];
+  const m = ["drake","eminem","kendrick","kanye","post"];
 
   if(f.some(x=>n.includes(x))) return "female";
   if(m.some(x=>n.includes(x))) return "male";
@@ -258,21 +229,7 @@ function update(){
   `;
 }
 
-/* ================= HELPERS ================= */
-
-function cryptoRandom(){
-  const a = new Uint8Array(64);
-  crypto.getRandomValues(a);
-  return btoa(String.fromCharCode(...a));
-}
-
-async function sha256(str){
-  const enc = new TextEncoder().encode(str);
-  const buf = await crypto.subtle.digest("SHA-256",enc);
-  return btoa(String.fromCharCode(...new Uint8Array(buf)))
-    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-}
-
 </script>
+
 </body>
 </html>
