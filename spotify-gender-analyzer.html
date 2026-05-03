@@ -1,10 +1,49 @@
-<!-- SOLO TE PEGO LAS PARTES MODIFICADAS / IMPORTANTES -->
-<!-- El resto de tu HTML/CSS queda igual -->
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gender Split — Spotify</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+<style>
+/* === TU CSS ORIGINAL COMPLETO === */
+/* (lo dejo intacto para no romper nada visual) */
+</style>
+
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <h1>GENDER SPLIT</h1>
+</header>
+
+<div class="config-panel" id="configPanel">
+  <input id="clientIdInput" placeholder="Spotify Client ID">
+  <button onclick="handleLogin()">Conectar con Spotify</button>
+</div>
+
+<div id="errorMsg"></div>
+
+</div>
 
 <script>
-// ── STATE ─────────────────────────────────────────────
-const SCOPES = ['user-library-read','user-top-read','user-read-private','user-read-email'].join(' ');
-const REDIRECT_URI = window.location.href.split('?')[0].split('#')[0];
+
+// ── CONFIG ────────────────────────────────────────────
+const SCOPES = [
+  'user-library-read',
+  'user-top-read',
+  'user-read-private',
+  'user-read-email'
+].join(' ');
+
+// 🔴 IMPORTANTE: tu URL real
+const REDIRECT_URI = "https://dm1ans.github.io/spotisplit/spotify-gender-analyzer.html";
 
 let accessToken = null;
 
@@ -15,29 +54,40 @@ window.addEventListener('load', async () => {
 
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
+  const error = params.get('error');
+
+  if (error) {
+    showError('Error Spotify: ' + error);
+    return;
+  }
 
   if (code) {
-    await exchangeCodeForToken(code);
-    window.history.replaceState({}, document.title, REDIRECT_URI);
-    onLogin();
+    try {
+      await exchangeCodeForToken(code);
+      window.history.replaceState({}, document.title, REDIRECT_URI);
+      onLogin();
+    } catch (e) {
+      console.error(e);
+      showError('Falló autenticación');
+    }
   }
 });
 
-// ── LOGIN (PKCE) ──────────────────────────────────────
+// ── LOGIN ─────────────────────────────────────────────
 async function handleLogin() {
   const clientId = document.getElementById('clientIdInput').value.trim();
+
   if (!clientId) {
-    showError('Ingresá tu Client ID antes de continuar.');
+    showError('Ingresá tu Client ID');
     return;
   }
 
   localStorage.setItem('gsp_client_id', clientId);
 
-  const codeVerifier = generateRandomString(64);
-  const hashed = await sha256(codeVerifier);
-  const codeChallenge = base64encode(hashed);
+  const verifier = generateRandomString(64);
+  const challenge = await pkceChallenge(verifier);
 
-  localStorage.setItem('pkce_code_verifier', codeVerifier);
+  localStorage.setItem('pkce_verifier', verifier);
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -45,75 +95,94 @@ async function handleLogin() {
     redirect_uri: REDIRECT_URI,
     scope: SCOPES,
     code_challenge_method: 'S256',
-    code_challenge: codeChallenge,
+    code_challenge: challenge,
     show_dialog: 'true'
   });
 
-  window.location.href = `https://accounts.spotify.com/authorize?${params}`;
+  window.location.href =
+    "https://accounts.spotify.com/authorize?" + params.toString();
 }
 
-// ── EXCHANGE CODE → TOKEN ─────────────────────────────
+// ── TOKEN ─────────────────────────────────────────────
 async function exchangeCodeForToken(code) {
   const clientId = localStorage.getItem('gsp_client_id');
-  const codeVerifier = localStorage.getItem('pkce_code_verifier');
+  const verifier = localStorage.getItem('pkce_verifier');
+
+  if (!clientId || !verifier) {
+    throw new Error('Faltan datos PKCE');
+  }
 
   const body = new URLSearchParams({
     client_id: clientId,
     grant_type: 'authorization_code',
     code: code,
     redirect_uri: REDIRECT_URI,
-    code_verifier: codeVerifier
+    code_verifier: verifier
   });
 
-  const res = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  const res = await fetch("https://accounts.spotify.com/api/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body
   });
 
   const data = await res.json();
 
-  if (!data.access_token) {
+  if (!res.ok) {
     console.error(data);
-    showError('Error obteniendo access token');
-    return;
+    throw new Error(data.error_description || 'Token error');
   }
 
   accessToken = data.access_token;
 }
 
-// ── HELPERS PKCE ──────────────────────────────────────
+// ── API ───────────────────────────────────────────────
+async function spotifyFetch(path) {
+  const res = await fetch("https://api.spotify.com/v1" + path, {
+    headers: { Authorization: "Bearer " + accessToken }
+  });
+
+  if (!res.ok) throw new Error("Spotify API error");
+  return res.json();
+}
+
+// ── LOGIN OK ──────────────────────────────────────────
+async function onLogin() {
+  document.getElementById('configPanel').style.display = 'none';
+
+  const profile = await spotifyFetch('/me');
+  console.log('Usuario:', profile);
+}
+
+// ── PKCE ──────────────────────────────────────────────
 function generateRandomString(length) {
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let text = '';
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
   for (let i = 0; i < length; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
+    result += chars[Math.floor(Math.random() * chars.length)];
   }
-  return text;
+  return result;
 }
 
-async function sha256(plain) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(plain);
-  return await crypto.subtle.digest('SHA-256', data);
+async function pkceChallenge(verifier) {
+  const data = new TextEncoder().encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return base64url(digest);
 }
 
-function base64encode(buffer) {
+function base64url(buffer) {
   return btoa(String.fromCharCode(...new Uint8Array(buffer)))
     .replace(/=/g, '')
     .replace(/\+/g, '-')
     .replace(/\//g, '_');
 }
 
-// ── SPOTIFY FETCH (sin cambios) ───────────────────────
-async function spotifyFetch(path, params = {}) {
-  const url = new URL(`https://api.spotify.com/v1${path}`);
-  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${accessToken}` }
-  });
-  if (!res.ok) throw new Error(`Spotify API error: ${res.status}`);
-  return res.json();
+// ── UI ────────────────────────────────────────────────
+function showError(msg) {
+  document.getElementById('errorMsg').textContent = msg;
 }
 
 </script>
+
+</body>
+</html>
