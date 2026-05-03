@@ -298,11 +298,32 @@ window.addEventListener('load', () => {
 });
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
-function handleLogin() {
+async function handleLogin() {
   const clientId = document.getElementById('clientIdInput').value.trim();
-  if (!clientId) { showError('Ingresá tu Client ID antes de continuar.'); return; }
+  if (!clientId) {
+    showError('Ingresá tu Client ID antes de continuar.');
+    return;
+  }
+
   localStorage.setItem('gsp_client_id', clientId);
-  const params = new URLSearchParams({ client_id: clientId, response_type: 'token', redirect_uri: REDIRECT_URI, scope: SCOPES, show_dialog: 'true' });
+
+  // --- PKCE: generar code_verifier y code_challenge ---
+  const codeVerifier = generateRandomString(64);
+  const hashed = await sha256(codeVerifier);
+  const codeChallenge = base64encode(hashed);
+
+  localStorage.setItem('pkce_code_verifier', codeVerifier);
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    response_type: 'code',                 // ← cambio clave
+    redirect_uri: REDIRECT_URI,
+    scope: SCOPES,
+    code_challenge_method: 'S256',         // ← PKCE
+    code_challenge: codeChallenge,
+    show_dialog: 'true'
+  });
+
   window.location.href = `https://accounts.spotify.com/authorize?${params}`;
 }
 
