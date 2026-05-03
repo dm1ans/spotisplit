@@ -217,9 +217,19 @@ async function exchangeCodeForToken(code) {
 async function onLogin() {
 
   document.querySelector(".panel").innerHTML =
-    "<h2>Login correcto</h2><p>Token recibido correctamente.</p>";
+    "<h2>Login correcto</h2><p>Cargando usuario...</p>";
 
-  console.log("ACCESS TOKEN:", accessToken);
+  const me = await fetch("https://api.spotify.com/v1/me", {
+    headers: {
+      Authorization: "Bearer " + accessToken
+    }
+  }).then(r => r.json());
+
+  console.log("USER:", me);
+
+  document.querySelector(".panel").innerHTML =
+    `<h2>Login correcto</h2>
+     <p>Usuario: ${me.display_name || me.id}</p>`;
 }
 
 // ======================
