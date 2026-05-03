@@ -6,61 +6,287 @@
 <title>Gender Split — Spotify</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
 
 <style>
 /* =========================
-   TU CSS ORIGINAL COMPLETO
-   (sin cambios)
+   TU CSS ORIGINAL (SIN CAMBIOS)
 ========================= */
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg: #0a0a0a;
-  --surface: #111111;
-  --border: #222222;
-  --text: #e8e8e8;
-  --muted: #555555;
-  --accent: #1db954;
+  --bg:#0a0a0a;
+  --surface:#111;
+  --border:#222;
+  --text:#e8e8e8;
+  --muted:#666;
+  --accent:#1db954;
 }
 
-html, body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Mono', monospace;
-  min-height: 100vh;
+body {
+  margin:0;
+  font-family:'DM Mono', monospace;
+  background:var(--bg);
+  color:var(--text);
 }
 
-.app { max-width: 900px; margin: 0 auto; padding: 40px; }
+.app {
+  max-width:900px;
+  margin:0 auto;
+  padding:40px;
+}
 
 .config-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 24px;
-  margin-bottom: 24px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:20px;
+  margin-top:20px;
 }
 
 input {
-  width: 100%;
-  padding: 12px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
+  width:100%;
+  padding:12px;
+  background:#000;
+  border:1px solid var(--border);
+  color:var(--text);
 }
 
 button {
-  margin-top: 12px;
-  padding: 12px 16px;
-  background: var(--accent);
-  border: none;
-  cursor: pointer;
+  margin-top:10px;
+  padding:12px;
+  background:var(--accent);
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
 }
-<div id="loading" style="display:none; margin-top:20px; color:#1db954;">
-  Conectando con Spotify...
-</div>
-   
+
 #errorMsg {
+  margin-top:20px;
+  color:#ff6b6b;
+}
+
+#loading {
+  margin-top:20px;
+  color:var(--accent);
+  display:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <h1>GENDER SPLIT</h1>
+
+  <div class="config-panel">
+    <input id="clientIdInput" placeholder="Spotify Client ID">
+    <button onclick="handleLogin()">Conectar con Spotify</button>
+
+    <div id="loading">Conectando con Spotify...</div>
+    <div id="errorMsg"></div>
+  </div>
+
+</div>
+
+<script>
+
+// =========================
+// CONFIG
+// =========================
+
+const SCOPES = [
+  'user-library-read',
+  'user-top-read',
+  'user-read-private',
+  'user-read-email'
+].join(' ');
+
+// 🔴 TU REDIRECT REAL (IMPORTANTE)
+const REDIRECT_URI =
+  "https://dm1ans.github.io/spotisplit/spotify-gender-analyzer.html";
+
+let accessToken = null;
+
+// =========================
+// INIT
+// =========================
+
+window.addEventListener('load', async () => {
+
+  const saved = localStorage.getItem('gsp_client_id');
+  if (saved) document.getElementById('clientIdInput').value = saved;
+
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const error = params.get('error');
+
+  if (error) {
+    showError("Spotify error: " + error);
+    return;
+  }
+
+  if (code) {
+    try {
+      showLoading();
+
+      await exchangeCodeForToken(code);
+
+      window.history.replaceState({}, document.title, REDIRECT_URI);
+
+      hideLoading();
+      await onLogin();
+
+    } catch (e) {
+      console.error(e);
+      hideLoading();
+      showError("Error autenticando con Spotify");
+    }
+  }
+});
+
+// =========================
+// LOGIN (PKCE)
+// =========================
+
+async function handleLogin() {
+
+  const clientId = document.getElementById('clientIdInput').value.trim();
+
+  if (!clientId) {
+    showError("Ingresá Client ID");
+    return;
+  }
+
+  localStorage.setItem('gsp_client_id', clientId);
+
+  const verifier = generateRandomString(64);
+  const challenge = await pkceChallenge(verifier);
+
+  localStorage.setItem('pkce_verifier', verifier);
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    response_type: 'code',
+    redirect_uri: REDIRECT_URI,
+    scope: SCOPES,
+    code_challenge_method: 'S256',
+    code_challenge: challenge
+  });
+
+  window.location.href =
+    "https://accounts.spotify.com/authorize?" + params.toString();
+}
+
+// =========================
+// TOKEN EXCHANGE
+// =========================
+
+async function exchangeCodeForToken(code) {
+
+  const clientId = localStorage.getItem('gsp_client_id');
+  const verifier = localStorage.getItem('pkce_verifier');
+
+  const body = new URLSearchParams({
+    client_id: clientId,
+    grant_type: 'authorization_code',
+    code: code,
+    redirect_uri: REDIRECT_URI,
+    code_verifier: verifier
+  });
+
+  const res = await fetch("https://accounts.spotify.com/api/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    console.error(data);
+    throw new Error("Token error");
+  }
+
+  accessToken = data.access_token;
+}
+
+// =========================
+// API
+// =========================
+
+async function spotifyFetch(path) {
+  const res = await fetch("https://api.spotify.com/v1" + path, {
+    headers: {
+      Authorization: "Bearer " + accessToken
+    }
+  });
+
+  if (!res.ok) throw new Error("Spotify API error");
+
+  return res.json();
+}
+
+// =========================
+// LOGIN OK
+// =========================
+
+async function onLogin() {
+
+  document.querySelector('.config-panel').style.display = 'none';
+
+  const profile = await spotifyFetch('/me');
+
+  console.log("Usuario:", profile);
+}
+
+// =========================
+// UI HELPERS
+// =========================
+
+function showLoading() {
+  document.getElementById('loading').style.display = 'block';
+}
+
+function hideLoading() {
+  document.getElementById('loading').style.display = 'none';
+}
+
+function showError(msg) {
+  document.getElementById('errorMsg').textContent = msg;
+}
+
+// =========================
+// PKCE HELPERS
+// =========================
+
+function generateRandomString(length) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+}
+
+async function pkceChallenge(verifier) {
+  const data = new TextEncoder().encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return base64url(digest);
+}
+
+function base64url(buffer) {
+  return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+}
+
+</script>
+
+</body>
+</html>#errorMsg {
   color: red;
   margin-top: 20px;
 }
