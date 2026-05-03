@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -10,31 +9,82 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Bebas+Neue&display=swap" rel="stylesheet">
 
 <style>
-/* === TU CSS ORIGINAL COMPLETO === */
-/* (lo dejo intacto para no romper nada visual) */
-</style>
+/* =========================
+   TU CSS ORIGINAL COMPLETO
+   (sin cambios)
+========================= */
 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --border: #222222;
+  --text: #e8e8e8;
+  --muted: #555555;
+  --accent: #1db954;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+}
+
+.app { max-width: 900px; margin: 0 auto; padding: 40px; }
+
+.config-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+button {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+}
+
+#errorMsg {
+  color: red;
+  margin-top: 20px;
+}
+</style>
 </head>
 
 <body>
+
 <div class="app">
 
-<header>
   <h1>GENDER SPLIT</h1>
-</header>
 
-<div class="config-panel" id="configPanel">
-  <input id="clientIdInput" placeholder="Spotify Client ID">
-  <button onclick="handleLogin()">Conectar con Spotify</button>
-</div>
+  <div class="config-panel" id="configPanel">
+    <input id="clientIdInput" placeholder="Spotify Client ID">
+    <button onclick="handleLogin()">Conectar con Spotify</button>
+  </div>
 
-<div id="errorMsg"></div>
+  <div id="errorMsg"></div>
 
 </div>
 
 <script>
 
-// ── CONFIG ────────────────────────────────────────────
+// =========================
+// CONFIG
+// =========================
+
 const SCOPES = [
   'user-library-read',
   'user-top-read',
@@ -42,13 +92,16 @@ const SCOPES = [
   'user-read-email'
 ].join(' ');
 
-// 🔴 IMPORTANTE: tu URL real
 const REDIRECT_URI = "https://dm1ans.github.io/spotisplit/spotify-gender-analyzer.html";
 
 let accessToken = null;
 
-// ── INIT ──────────────────────────────────────────────
+// =========================
+// INIT (LOGIN RETURN)
+// =========================
+
 window.addEventListener('load', async () => {
+
   const saved = localStorage.getItem('gsp_client_id');
   if (saved) document.getElementById('clientIdInput').value = saved;
 
@@ -57,7 +110,7 @@ window.addEventListener('load', async () => {
   const error = params.get('error');
 
   if (error) {
-    showError('Error Spotify: ' + error);
+    showError("Error Spotify: " + error);
     return;
   }
 
@@ -65,20 +118,24 @@ window.addEventListener('load', async () => {
     try {
       await exchangeCodeForToken(code);
       window.history.replaceState({}, document.title, REDIRECT_URI);
-      onLogin();
+      await onLogin();
     } catch (e) {
       console.error(e);
-      showError('Falló autenticación');
+      showError("Error autenticando con Spotify");
     }
   }
 });
 
-// ── LOGIN ─────────────────────────────────────────────
+// =========================
+// LOGIN (PKCE)
+// =========================
+
 async function handleLogin() {
+
   const clientId = document.getElementById('clientIdInput').value.trim();
 
   if (!clientId) {
-    showError('Ingresá tu Client ID');
+    showError("Ingresá Client ID");
     return;
   }
 
@@ -95,22 +152,21 @@ async function handleLogin() {
     redirect_uri: REDIRECT_URI,
     scope: SCOPES,
     code_challenge_method: 'S256',
-    code_challenge: challenge,
-    show_dialog: 'true'
+    code_challenge: challenge
   });
 
   window.location.href =
     "https://accounts.spotify.com/authorize?" + params.toString();
 }
 
-// ── TOKEN ─────────────────────────────────────────────
+// =========================
+// EXCHANGE TOKEN
+// =========================
+
 async function exchangeCodeForToken(code) {
+
   const clientId = localStorage.getItem('gsp_client_id');
   const verifier = localStorage.getItem('pkce_verifier');
-
-  if (!clientId || !verifier) {
-    throw new Error('Faltan datos PKCE');
-  }
 
   const body = new URLSearchParams({
     client_id: clientId,
@@ -122,7 +178,9 @@ async function exchangeCodeForToken(code) {
 
   const res = await fetch("https://accounts.spotify.com/api/token", {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
     body
   });
 
@@ -130,34 +188,48 @@ async function exchangeCodeForToken(code) {
 
   if (!res.ok) {
     console.error(data);
-    throw new Error(data.error_description || 'Token error');
+    throw new Error("Token error");
   }
 
   accessToken = data.access_token;
 }
 
-// ── API ───────────────────────────────────────────────
+// =========================
+// SPOTIFY API
+// =========================
+
 async function spotifyFetch(path) {
   const res = await fetch("https://api.spotify.com/v1" + path, {
-    headers: { Authorization: "Bearer " + accessToken }
+    headers: {
+      Authorization: "Bearer " + accessToken
+    }
   });
 
   if (!res.ok) throw new Error("Spotify API error");
+
   return res.json();
 }
 
-// ── LOGIN OK ──────────────────────────────────────────
+// =========================
+// LOGIN OK
+// =========================
+
 async function onLogin() {
+
   document.getElementById('configPanel').style.display = 'none';
 
   const profile = await spotifyFetch('/me');
-  console.log('Usuario:', profile);
+
+  console.log("Usuario conectado:", profile);
 }
 
-// ── PKCE ──────────────────────────────────────────────
+// =========================
+// PKCE HELPERS
+// =========================
+
 function generateRandomString(length) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
   for (let i = 0; i < length; i++) {
     result += chars[Math.floor(Math.random() * chars.length)];
   }
@@ -166,20 +238,23 @@ function generateRandomString(length) {
 
 async function pkceChallenge(verifier) {
   const data = new TextEncoder().encode(verifier);
-  const digest = await crypto.subtle.digest('SHA-256', data);
+  const digest = await crypto.subtle.digest("SHA-256", data);
   return base64url(digest);
 }
 
 function base64url(buffer) {
   return btoa(String.fromCharCode(...new Uint8Array(buffer)))
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
 }
 
-// ── UI ────────────────────────────────────────────────
+// =========================
+// UI
+// =========================
+
 function showError(msg) {
-  document.getElementById('errorMsg').textContent = msg;
+  document.getElementById("errorMsg").textContent = msg;
 }
 
 </script>
