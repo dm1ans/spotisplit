@@ -3,26 +3,24 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Gender Split Fast</title>
+<title>Gender Split Fast FIX</title>
 
 <style>
-body { margin:0; background:#0a0a0a; color:#eee; font-family:system-ui; }
-.app { max-width:900px; margin:auto; padding:30px; }
-button { padding:10px; margin:5px; }
-.grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-.card { background:#111; padding:10px; border:1px solid #222; }
-.bar { height:5px; background:#222; }
-.fill { height:100%; width:0%; background:#1db954; }
-.counter { display:flex; gap:10px; flex-wrap:wrap; margin:10px 0; }
-.counter div { padding:6px 10px; border:1px solid #222; }
-.small { font-size:12px; opacity:.7; }
+body{margin:0;background:#0a0a0a;color:#eee;font-family:system-ui}
+.app{max-width:900px;margin:auto;padding:30px}
+button{padding:10px;margin:5px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.card{background:#111;padding:10px;border:1px solid #222}
+.counter{display:flex;gap:10px;margin:10px 0;flex-wrap:wrap}
+.counter div{padding:6px 10px;border:1px solid #222}
+.small{font-size:12px;opacity:.7}
 </style>
 </head>
 
 <body>
 <div class="app">
 
-<h2>Gender Split (Fast Mode)</h2>
+<h2>Gender Split FIX</h2>
 
 <input id="client" placeholder="Spotify Client ID"/>
 <button onclick="login()">Login</button>
@@ -34,7 +32,6 @@ button { padding:10px; margin:5px; }
   <button onclick="run('long_term')">1 año</button>
 
   <div class="counter" id="counter"></div>
-
   <div class="grid" id="grid"></div>
 
 </div>
@@ -55,13 +52,13 @@ const state = {
 
 (function load(){
   try{
-    const c = localStorage.getItem("cache_fast");
+    const c = localStorage.getItem("cache");
     if(c) state.cache = new Map(JSON.parse(c));
   }catch{}
 })();
 
 function save(){
-  localStorage.setItem("cache_fast", JSON.stringify([...state.cache]));
+  localStorage.setItem("cache", JSON.stringify([...state.cache]));
 }
 
 /* ================= LOGIN ================= */
@@ -76,19 +73,21 @@ async function login(){
 
   localStorage.setItem("verifier",verifier);
 
-  const url =
-  "https://accounts.spotify.com/authorize"+
-  "?client_id="+cid+
-  "&response_type=code"+
-  "&redirect_uri="+location.href.split("?")[0]+
-  "&scope=user-top-read"+
-  "&code_challenge_method=S256"+
-  "&code_challenge="+challenge;
+  const redirect = location.href.split("?")[0];
 
-  location.href=url;
+  const url =
+  "https://accounts.spotify.com/authorize" +
+  "?client_id=" + cid +
+  "&response_type=code" +
+  "&redirect_uri=" + encodeURIComponent(redirect) +
+  "&scope=user-top-read user-library-read" +
+  "&code_challenge_method=S256" +
+  "&code_challenge=" + challenge;
+
+  location.href = url;
 }
 
-/* ================= TOKEN ================= */
+/* ================= TOKEN EXCHANGE (FIX REAL) ================= */
 
 window.onload = async () => {
 
@@ -100,19 +99,28 @@ window.onload = async () => {
     const verifier = localStorage.getItem("verifier");
 
     const body = new URLSearchParams({
-      client_id:cid,
-      grant_type:"authorization_code",
+      client_id: cid,
+      grant_type: "authorization_code",
       code,
-      redirect_uri:location.href.split("?")[0],
-      code_verifier:verifier
+      redirect_uri: location.href.split("?")[0],
+      code_verifier: verifier
     });
 
-    const r = await fetch("https://api.spotify.com/v1/token",{
+    const r = await fetch("https://accounts.spotify.com/api/token", {
       method:"POST",
+      headers:{
+        "Content-Type":"application/x-www-form-urlencoded"
+      },
       body
     });
 
     const d = await r.json();
+
+    if(!d.access_token){
+      alert("Error login Spotify");
+      console.log(d);
+      return;
+    }
 
     state.token = d.access_token;
 
@@ -135,74 +143,53 @@ async function api(url){
 
 async function run(range){
 
-  state.counts = {female:0,male:0,group:0,unknown:0};
+  state.counts={female:0,male:0,group:0,unknown:0};
 
   document.getElementById("grid").innerHTML="";
 
   const data = await api(`/me/top/artists?limit=50&time_range=${range}`);
 
-  await processFast(data.items);
+  await process(data.items);
 }
 
-/* ================= FAST PROCESS (KEY OPTIMIZATION) ================= */
+/* ================= PROCESS ================= */
 
-async function processFast(list){
+async function process(list){
 
-  const queue = list.map(a=>a.name);
+  for(const a of list){
 
-  const concurrency = 6; // 🔥 optimización clave
+    const g = await classify(a.name);
 
-  let index = 0;
+    state.counts[g]++;
 
-  const worker = async () => {
+    render(a.name,g);
 
-    while(index < queue.length){
-
-      const name = queue[index++];
-
-      const g = await classifyFast(name);
-
-      state.counts[g]++;
-
-      render(name,g);
-
-      updateCounter();
-    }
-  };
-
-  await Promise.all(
-    Array.from({length:concurrency},worker)
-  );
+    update();
+  }
 
   save();
 }
 
-/* ================= CLASSIFY FAST ================= */
+/* ================= CLASSIFY ================= */
 
-async function classifyFast(name){
+async function classify(name){
 
   const k = name.toLowerCase();
 
   if(state.cache.has(k)) return state.cache.get(k);
 
-  // 🔥 PRIORIDAD 1: fallback local primero (reduce 70% llamadas)
-  const fb = fastGuess(name);
-  if(fb!=="unknown"){
-    state.cache.set(k,fb);
-    return fb;
-  }
+  let g = guess(name);
 
-  // 🔥 PRIORIDAD 2: MusicBrainz solo si necesario
-  const mb = await musicbrainzLite(name);
+  if(g==="unknown") g = await mb(name);
 
-  state.cache.set(k,mb);
+  state.cache.set(k,g);
 
-  return mb;
+  return g;
 }
 
-/* ================= MUSICBRAINZ OPTIMIZADO ================= */
+/* ================= MUSICBRAINZ ================= */
 
-async function musicbrainzLite(name){
+async function mb(name){
 
   try{
 
@@ -227,17 +214,17 @@ async function musicbrainzLite(name){
   }
 }
 
-/* ================= ULTRA FAST GUESS ================= */
+/* ================= FAST GUESS ================= */
 
-function fastGuess(n){
+function guess(n){
 
   n = n.toLowerCase();
 
-  const female = ["billie","adele","rihanna","rosalia","lorde","dua","sza"];
-  const male = ["drake","eminem","kendrick","kanye","post","travis"];
+  const f = ["billie","adele","rihanna","rosalia","dua","sza"];
+  const m = ["drake","eminem","kendrick","kanye","post","travis"];
 
-  if(female.some(x=>n.includes(x))) return "female";
-  if(male.some(x=>n.includes(x))) return "male";
+  if(f.some(x=>n.includes(x))) return "female";
+  if(m.some(x=>n.includes(x))) return "male";
 
   return "unknown";
 }
@@ -254,13 +241,12 @@ function render(name,g){
   d.innerHTML=`
     <div>${name}</div>
     <div class="small">${g}</div>
-    <div class="bar"><div class="fill" style="width:100%"></div></div>
   `;
 
   el.appendChild(d);
 }
 
-function updateCounter(){
+function update(){
 
   const c = state.counts;
 
@@ -268,7 +254,7 @@ function updateCounter(){
     <div>♀ ${c.female}</div>
     <div>♂ ${c.male}</div>
     <div>👥 ${c.group}</div>
-    <div>?</div>
+    <div>? ${c.unknown}</div>
   `;
 }
 
