@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gender Split — Spotify</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --text: #e8e8e8;
+    --muted: #555555;
+    --accent: #1db954;
+    --c-female:      #ff6b9d;
+    --c-male:        #4a9eff;
+    --c-nb:          #f4c430;
+    --c-trans-woman: #ff9de2;
+    --c-trans-man:   #74c0fc;
+    --c-intersex:    #c084fc;
+    --c-other:       #fb923c;
+    --c-group:       #a78bfa;
+    --c-unknown:     #444444;
+  }
+
+  html, body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; overflow-x: hidden; }
+
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+    background-size: 48px 48px; pointer-events: none; z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  header { margin-bottom: 56px; }
+  .logo-row { display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px; flex-wrap: wrap; }
+  h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px, 10vw, 88px); letter-spacing: 2px; line-height: 1; }
+  .badge { font-size: 11px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; border: 1px solid var(--accent); padding: 3px 8px; white-space: nowrap; }
+  .subtitle { font-size: 12px; color: var(--muted); letter-spacing: .5px; line-height: 1.7; max-width: 520px; }
+
+  .config-panel { background: var(--surface); border: 1px solid var(--border); padding: 28px; margin-bottom: 32px; }
+  .config-label { font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+  .config-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; padding: 12px 14px; outline: none; transition: border-color .2s; }
+  .config-input:focus { border-color: var(--accent); }
+  .config-input::placeholder { color: var(--muted); }
+  .config-hint { font-size: 11px; color: var(--muted); margin-top: 10px; line-height: 1.8; }
+  .config-hint a { color: var(--accent); text-decoration: none; }
+  .config-hint a:hover { text-decoration: underline; }
+  .config-hint code { color: var(--accent); }
+
+  .btn-login { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: var(--accent); color: #000; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; border: none; padding: 14px 28px; cursor: pointer; margin-top: 24px; transition: opacity .2s, transform .15s; width: 100%; }
+  .btn-login:hover { opacity: .85; transform: translateY(-1px); }
+
+  .user-card { display: none; align-items: center; gap: 16px; background: var(--surface); border: 1px solid var(--border); padding: 16px 20px; margin-bottom: 32px; }
+  .user-card.visible { display: flex; }
+  .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); }
+  .user-name { font-size: 13px; }
+  .user-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+  .btn-logout { margin-left: auto; background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 6px 12px; cursor: pointer; transition: all .2s; }
+  .btn-logout:hover { border-color: var(--text); color: var(--text); }
+
+  .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .tab { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); background: none; border: none; border-bottom: 2px solid transparent; padding: 12px 20px; cursor: pointer; transition: color .2s, border-color .2s; margin-bottom: -1px; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  .time-filters { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+  .time-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--border); padding: 8px 16px; cursor: pointer; transition: all .2s; }
+  .time-btn:hover { border-color: var(--muted); color: var(--text); }
+  .time-btn.active { border-color: var(--accent); color: var(--accent); }
+
+  .btn-analyze { display: inline-flex; align-items: center; gap: 10px; background: none; border: 1px solid var(--text); color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 24px; cursor: pointer; transition: background .2s, color .2s; margin-bottom: 40px; }
+  .btn-analyze:hover { background: var(--text); color: var(--bg); }
+  .btn-analyze:disabled { opacity: .3; cursor: not-allowed; }
+
+  .loading { display: none; flex-direction: column; gap: 10px; margin-bottom: 40px; }
+  .loading.visible { display: flex; }
+  .loading-row { display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+  .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .progress-track { height: 2px; background: var(--border); width: 100%; }
+  .progress-fill { height: 100%; background: var(--accent); width: 0; transition: width .4s; }
+  .mb-note { font-size: 10px; color: var(--muted); letter-spacing: 1px; font-style: italic; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 32px; padding: 20px; background: var(--surface); border: 1px solid var(--border); }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  .results { display: none; }
+  .results.visible { display: block; }
+
+  .numbers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin-bottom: 40px; }
+  .number-cell { background: var(--surface); padding: 20px 16px; text-align: center; }
+  .number-big { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1; margin-bottom: 4px; }
+  .number-desc { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .number-count { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .stat-row { display: grid; grid-template-columns: 130px 1fr 52px; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .stat-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-align: right; }
+  .bar-track { height: 6px; background: var(--border); overflow: hidden; }
+  .bar-fill { height: 100%; width: 0; transition: width 1s cubic-bezier(.22,1,.36,1); }
+  .stat-pct { font-size: 12px; color: var(--text); text-align: right; }
+
+  .section-title { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 16px; margin-top: 40px; }
+
+  .artist-list { display: flex; flex-direction: column; gap: 2px; margin-bottom: 32px; }
+  .artist-row { display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: var(--surface); border-left: 3px solid transparent; transition: background .15s; }
+  .artist-row:hover { background: #161616; }
+  .artist-img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: var(--border); flex-shrink: 0; }
+  .artist-name { font-size: 13px; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .artist-source { font-size: 9px; color: var(--muted); letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
+  .artist-tag { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 8px; border: 1px solid; white-space: nowrap; flex-shrink: 0; }
+
+  .error-msg { display: none; background: #1a0a0a; border: 1px solid #440000; color: #ff6b6b; font-size: 12px; padding: 16px 20px; margin-bottom: 24px; line-height: 1.6; }
+  .error-msg.visible { display: block; }
+
+  footer { margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--border); font-size: 10px; color: var(--muted); letter-spacing: 1px; line-height: 1.8; }
+
+  @media (max-width: 600px) {
+    .numbers-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-row { grid-template-columns: 100px 1fr 44px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="logo-row">
+      <h1>GENDER<br>SPLIT</h1>
+      <span class="badge">Spotify + MusicBrainz</span>
+    </div>
+    <p class="subtitle">
+      Analizá el desglose de género de los artistas que escuchás.<br>
+      Clasificación basada en datos declarados en MusicBrainz — no inferidos por nombre.<br>
+      Incluye: mujer, hombre, no binario, mujer trans, hombre trans, intersex y más.
+    </p>
+  </header>
+
+  <div class="config-panel" id="configPanel">
+    <div class="config-label">Spotify Client ID</div>
+    <input type="text" class="config-input" id="clientIdInput" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+    <div class="config-hint">
+      Crear app en <a href="https://developer.spotify.com/dashboard" target="_blank">developer.spotify.com/dashboard</a>
+      y agregar como Redirect URI:<br>
+      <code>http://localhost:8080/spotify-gender-analyzer.html</code><br><br>
+      <strong style="color:var(--text)">Nota:</strong> MusicBrainz tiene un límite de 1 request/segundo.
+      Con muchos artistas el análisis puede tomar varios minutos — es normal.
+    </div>
+    <button class="btn-login" onclick="handleLogin()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+      Conectar con Spotify
+    </button>
+  </div>
+
+  <div class="user-card" id="userCard">
+    <img class="user-avatar" id="userAvatar" src="" alt="">
+    <div>
+      <div class="user-label">Conectado como</div>
+      <div class="user-name" id="userName">—</div>
+    </div>
+    <button class="btn-logout" onclick="logout()">Salir</button>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <div class="tabs" id="mainTabs" style="display:none">
+    <button class="tab active" onclick="switchTab('liked')" id="tab-liked">Me gusta</button>
+    <button class="tab" onclick="switchTab('top')" id="tab-top">Top artistas</button>
+  </div>
+
+  <div class="time-filters" id="likedFilters" style="display:none">
+    <button class="time-btn active" onclick="setLikedPeriod('all')" id="liked-all">Desde siempre</button>
+    <button class="time-btn" onclick="setLikedPeriod('5y')" id="liked-5y">Últimos 5 años</button>
+    <button class="time-btn" onclick="setLikedPeriod('3y')" id="liked-3y">Últimos 3 años</button>
+    <button class="time-btn" onclick="setLikedPeriod('1y')" id="liked-1y">Último año</button>
+  </div>
+
+  <div class="time-filters" id="timeFilters" style="display:none">
+    <button class="time-btn active" onclick="setRange('short_term')" id="range-short_term">Último mes</button>
+    <button class="time-btn" onclick="setRange('medium_term')" id="range-medium_term">6 meses</button>
+    <button class="time-btn" onclick="setRange('long_term')" id="range-long_term">Todo el tiempo</button>
+  </div>
+
+  <button class="btn-analyze" id="analyzeBtn" style="display:none" onclick="analyze()">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+    Analizar
+  </button>
+
+  <div class="loading" id="loadingEl">
+    <div class="loading-row">
+      <div class="spinner"></div>
+      <span id="loadingText">Cargando...</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="mb-note" id="mbNote" style="display:none">
+      MusicBrainz permite 1 búsqueda por segundo — el proceso es lento pero preciso.
+    </div>
+  </div>
+
+  <div class="legend" id="legendEl" style="display:none">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-female)"></div>Mujer</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-male)"></div>Hombre</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-nb)"></div>No binario</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-trans-woman)"></div>Mujer trans</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-trans-man)"></div>Hombre trans</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-intersex)"></div>Intersex</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-other)"></div>Otro género</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-group)"></div>Grupo / Banda</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-unknown)"></div>Sin datos</div>
+  </div>
+
+  <div class="results" id="resultsEl">
+    <div class="numbers-grid" id="numbersGrid"></div>
+    <div id="barsContainer"></div>
+    <div class="section-title" id="artistsTitle">Artistas analizados</div>
+    <div class="artist-list" id="artistList"></div>
+  </div>
+
+  <footer>
+    Gender Split — Spotify Web API + MusicBrainz Open Data.<br>
+    El género refleja lo declarado en MusicBrainz. Artistas sin entrada aparecen como "Sin datos".<br>
+    MusicBrainz es una base de datos abierta mantenida por la comunidad.
+  </footer>
+
+</div>
+<script>
+// ── GÉNERO CONFIG ─────────────────────────────────────────────────────────────
+const MB_GENDER_MAP = {
+  'male':               'male',
+  'female':             'female',
+  'non-binary':         'non-binary',
+  'nonbinary':          'non-binary',
+  'transgender female': 'trans-woman',
+  'transgender male':   'trans-man',
+  'trans female':       'trans-woman',
+  'trans male':         'trans-man',
+  'trans woman':        'trans-woman',
+  'trans man':          'trans-man',
+  'intersex':           'intersex',
+  'other':              'other',
+  'not applicable':     'group',
+};
+
+const GENDER_LABELS = {
+  'female':      'Mujer',
+  'male':        'Hombre',
+  'non-binary':  'No binario',
+  'trans-woman': 'Mujer trans',
+  'trans-man':   'Hombre trans',
+  'intersex':    'Intersex',
+  'other':       'Otro género',
+  'group':       'Grupo / Banda',
+  'unknown':     'Sin datos',
+};
+
+const GENDER_COLORS = {
+  'female':      'var(--c-female)',
+  'male':        'var(--c-male)',
+  'non-binary':  'var(--c-nb)',
+  'trans-woman': 'var(--c-trans-woman)',
+  'trans-man':   'var(--c-trans-man)',
+  'intersex':    'var(--c-intersex)',
+  'other':       'var(--c-other)',
+  'group':       'var(--c-group)',
+  'unknown':     'var(--c-unknown)',
+};
+
+const GENDER_ORDER = ['female','male','non-binary','trans-woman','trans-man','intersex','other','group','unknown'];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const SCOPES = ['user-library-read','user-top-read','user-read-private','user-read-email'].join(' ');
+const REDIRECT_URI = window.location.href.split('?')[0].split('#')[0];
+
+let accessToken = null;
+let currentTab = 'liked';
+let currentRange = 'short_term';
+let currentLikedPeriod = 'all';
+const mbCache = new Map();
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('gsp_client_id');
+  if (saved) document.getElementById('clientIdInput').value = saved;
+
+  const hash = window.location.hash;
+  if (hash.includes('access_token')) {
+    const params = new URLSearchParams(hash.substring(1));
+    accessToken = params.get('access_token');
+    history.replaceState(null, null, window.location.pathname);
+    onLogin();
+  }
+});
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function handleLogin() {
+  const clientId = document.getElementById('clientIdInput').value.trim();
+  if (!clientId) { showError('Ingresá tu Client ID antes de continuar.'); return; }
+  localStorage.setItem('gsp_client_id', clientId);
+  const params = new URLSearchParams({ client_id: clientId, response_type: 'token', redirect_uri: REDIRECT_URI, scope: SCOPES, show_dialog: 'true' });
+  window.location.href = `https://accounts.spotify.com/authorize?${params}`;
+}
+
+function logout() {
+  accessToken = null;
+  document.getElementById('userCard').classList.remove('visible');
+  ['mainTabs','likedFilters','timeFilters','analyzeBtn'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.display = 'none';
+  });
+  document.getElementById('resultsEl').classList.remove('visible');
+  document.getElementById('legendEl').style.display = 'none';
+  document.getElementById('configPanel').style.display = 'block';
+}
+
+async function onLogin() {
+  document.getElementById('configPanel').style.display = 'none';
+  document.getElementById('mainTabs').style.display = 'flex';
+  document.getElementById('likedFilters').style.display = 'flex';
+  document.getElementById('analyzeBtn').style.display = 'inline-flex';
+  try {
+    const profile = await spotifyFetch('/me');
+    document.getElementById('userCard').classList.add('visible');
+    document.getElementById('userName').textContent = profile.display_name || profile.id;
+    const img = document.getElementById('userAvatar');
+    if (profile.images && profile.images.length) img.src = profile.images[0].url;
+    else img.style.display = 'none';
+  } catch(e) {
+    showError('No se pudo cargar tu perfil. Verificá tu Client ID y Redirect URI.');
+  }
+}
+
+// ── SPOTIFY API ───────────────────────────────────────────────────────────────
+async function spotifyFetch(path, params = {}) {
+  const url = new URL(`https://api.spotify.com/v1${path}`);
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (!res.ok) throw new Error(`Spotify API error: ${res.status}`);
+  return res.json();
+}
+
+// ── TABS / FILTERS ────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.getElementById('timeFilters').style.display  = tab === 'top'   ? 'flex' : 'none';
+  document.getElementById('likedFilters').style.display = tab === 'liked' ? 'flex' : 'none';
+  document.getElementById('resultsEl').classList.remove('visible');
+  document.getElementById('legendEl').style.display = 'none';
+}
+
+function setRange(range) {
+  currentRange = range;
+  document.querySelectorAll('#timeFilters .time-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`range-${range}`).classList.add('active');
+}
+
+function setLikedPeriod(p) {
+  currentLikedPeriod = p;
+  document.querySelectorAll('#likedFilters .time-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`liked-${p}`).classList.add('active');
+}
+
+// ── ANALYZE ───────────────────────────────────────────────────────────────────
+async function analyze() {
+  hideError();
+  document.getElementById('resultsEl').classList.remove('visible');
+  document.getElementById('legendEl').style.display = 'none';
+  document.getElementById('mbNote').style.display = 'none';
+  setProgress(0);
+  showLoading('Obteniendo artistas...');
+
+  try {
+    let artists = currentTab === 'liked' ? await getLikedArtists() : await getTopArtists();
+
+    if (!artists.length) {
+      showError('No se encontraron artistas. Probá con otra fuente o período.');
+      hideLoading();
+      return;
+    }
+
+    await enrichImages(artists);
+
+    document.getElementById('mbNote').style.display = 'block';
+    const classified = await classifyWithMusicBrainz(artists);
+
+    hideLoading();
+    renderResults(classified);
+  } catch(e) {
+    hideLoading();
+    showError(`Error: ${e.message}. ¿Tu token expiró? Actualizá la página y reconectá.`);
+  }
+}
+
+// ── FETCH ARTISTS ─────────────────────────────────────────────────────────────
+async function getLikedArtists() {
+  const artistMap = new Map();
+  let offset = 0;
+  const limit = 50;
+  let cutoff = null;
+
+  if (currentLikedPeriod !== 'all') {
+    cutoff = new Date();
+    cutoff.setFullYear(cutoff.getFullYear() - parseInt(currentLikedPeriod));
+  }
+
+  const labels = { all: 'desde siempre', '1y': 'del último año', '3y': 'de los últimos 3 años', '5y': 'de los últimos 5 años' };
+  setLoadingText(`Cargando canciones con me gusta ${labels[currentLikedPeriod]}...`);
+
+  while (true) {
+    const data = await spotifyFetch('/me/tracks', { limit, offset });
+    let reachedCutoff = false;
+
+    for (const item of data.items) {
+      if (!item.track) continue;
+      if (cutoff && new Date(item.added_at) < cutoff) { reachedCutoff = true; break; }
+      for (const artist of item.track.artists) {
+        if (!artistMap.has(artist.id))
+          artistMap.set(artist.id, { id: artist.id, name: artist.name, image: null });
+      }
+    }
+
+    const loaded = Math.min(offset + limit, data.total);
+    setLoadingText(`Canciones: ${loaded}/${data.total} — ${artistMap.size} artistas únicos`);
+    setProgress(loaded / Math.min(data.total, 2500) * 25);
+
+    if (reachedCutoff || !data.next || offset + limit >= data.total) break;
+    offset += limit;
+    if (offset >= 2500) break;
+  }
+
+  return Array.from(artistMap.values());
+}
+
+async function getTopArtists() {
+  const data = await spotifyFetch('/me/top/artists', { time_range: currentRange, limit: 50 });
+  return data.items.map(a => ({ id: a.id, name: a.name, image: a.images.length ? a.images[a.images.length-1].url : null }));
+}
+
+async function enrichImages(artists) {
+  const noImg = artists.filter(a => !a.image && a.id);
+  for (let i = 0; i < noImg.length; i += 50) {
+    try {
+      const ids = noImg.slice(i, i+50).map(a => a.id).join(',');
+      const data = await spotifyFetch('/artists', { ids });
+      for (const ar of data.artists) {
+        const found = artists.find(a => a.id === ar.id);
+        if (found && ar.images.length) found.image = ar.images[ar.images.length-1].url;
+      }
+    } catch(e) {}
+  }
+}
+
+// ── MUSICBRAINZ ───────────────────────────────────────────────────────────────
+const MB_BASE = 'https://musicbrainz.org/ws/2';
+const MB_DELAY = 1100;
+const GROUP_TYPES = ['group','orchestra','choir','character','other'];
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function mbFetch(url) {
+  const res = await fetch(url, {
+    headers: {
+      'Accept': 'application/json',
+      'User-Agent': 'GenderSplit/1.0 (spotify-gender-analyzer)'
+    }
+  });
+  if (res.status === 429) { await sleep(3000); return mbFetch(url); }
+  if (!res.ok) return null;
+  return res.json();
+}
+
+async function getMBGender(name) {
+  const key = name.toLowerCase().trim();
+  if (mbCache.has(key)) return mbCache.get(key);
+
+  const result = { gender: 'unknown', type: null };
+
+  try {
+    const searchUrl = `${MB_BASE}/artist?query=artist:"${encodeURIComponent(name)}"&limit=3&fmt=json`;
+    const searchData = await mbFetch(searchUrl);
+    await sleep(MB_DELAY);
+
+    if (!searchData || !searchData.artists || !searchData.artists.length) {
+      mbCache.set(key, result);
+      return result;
+    }
+
+    const best = searchData.artists[0];
+    result.type = best.type || null;
+
+    // Grupo
+    if (best.type && GROUP_TYPES.includes(best.type.toLowerCase())) {
+      result.gender = 'group';
+      mbCache.set(key, result);
+      return result;
+    }
+
+    // Género en resultado de búsqueda
+    if (best.gender) {
+      result.gender = normalizeGender(best.gender);
+      mbCache.set(key, result);
+      return result;
+    }
+
+    // Lookup por MBID si no viene el género
+    const lookupData = await mbFetch(`${MB_BASE}/artist/${best.id}?fmt=json`);
+    await sleep(MB_DELAY);
+
+    if (lookupData) {
+      if (lookupData.type && GROUP_TYPES.includes(lookupData.type.toLowerCase())) {
+        result.gender = 'group';
+      } else if (lookupData.gender) {
+        result.gender = normalizeGender(lookupData.gender);
+      }
+      result.type = lookupData.type || result.type;
+    }
+  } catch(e) {}
+
+  mbCache.set(key, result);
+  return result;
+}
+
+function normalizeGender(raw) {
+  if (!raw) return 'unknown';
+  const lower = raw.toLowerCase().trim();
+  return MB_GENDER_MAP[lower] || 'other';
+}
+
+async function classifyWithMusicBrainz(artists) {
+  const total = artists.length;
+  const results = [];
+
+  for (let i = 0; i < total; i++) {
+    const artist = artists[i];
+    setLoadingText(`MusicBrainz: ${artist.name} (${i+1}/${total})`);
+    setProgress(25 + (i / total) * 75);
+
+    const mb = await getMBGender(artist.name);
+
+    let gender = mb.gender;
+    let source = 'musicbrainz';
+
+    // Fallback por nombre si MusicBrainz no tiene datos
+    if (gender === 'unknown') {
+      const inferred = inferGenderByName(artist.name);
+      if (inferred !== 'unknown') {
+        gender = inferred;
+        source = 'nombre';
+      } else {
+        source = 'sin datos';
+      }
+    }
+
+    results.push({ ...artist, gender, mbType: mb.type, source });
+  }
+
+  setProgress(100);
+  return results;
+}
+
+// ── HEURÍSTICA POR NOMBRE ─────────────────────────────────────────────────────
+// Fallback para artistas no encontrados en MusicBrainz.
+// Solo puede inferir male/female/group — géneros no binarios requieren fuente declarada.
+
+const FEMALE_NAMES = new Set([
+  'taylor','adele','beyoncé','beyonce','rihanna','billie','ariana','selena','dua','olivia',
+  'miley','camila','demi','nicki','cardi','lizzo','sia','lorde','lana','halsey','kesha',
+  'katy','bebe','ava','clairo','sza','tinashe','ella','jessie','charli','anne','amy',
+  'alicia','nina','diana','sarah','jennifer','jessica','emily','grace','aurora','paloma',
+  'rosalía','rosalia','ana','maria','paula','valentina','sofia','claudia','laura','marta',
+  'elena','sara','alba','carmen','lucía','lucia','pilar','teresa','rosa','patricia',
+  'natalia','andrea','mónica','monica','susana','cristina','sandra','eva','virginia',
+  'irene','beatriz','noa','amaia','ruth','leire','aitana','malú','malu','india','vanessa',
+  'shakira','nathy','grimes','lykke','feist','björk','bjork','imogen','fka','solange',
+  'kelela','sevdaliza','ibeyi','mitski','weyes','snail','phoebe','clairo','beabadoobee',
+  'torres','caroline','yeule','oklou','shygirl','arca','sophie','angèle','angele','pomme',
+  'clara','camille','hoshi','jain','aya','yseult','lous','wejdene','mentissa','fatoumata',
+  'erykah','lauryn','jill','jazmine','ledisi','fantasia','keyshia','tamar','jordin','ciara',
+  'ashanti','brandy','monica','kacey','maren','miranda','carrie','dolly','emmylou','loretta',
+  'tammy','shania','faith','martina','trisha','wynonna','reba','norah','joni','joan',
+  'sheryl','alanis','fiona','ani','tori','enya','sinead','natalie','jewel','melissa',
+  'avril','pink','gwen','hayley','michelle','kelly','christina','mandy','hilary','britney',
+  'janet','paula','gloria','cyndi','donna','cher','aretha','tina','janis','patti','bonnie',
+  'stevie','linda','karen','debbie','alice','kate','emma','julia','anna','lisa','mary',
+  'margaret','helen','elizabeth','claire','rachel','rebecca','hannah','sophia','barbara',
+  'susan','dorothy','betty','ruth','sharon','kathleen','virginia','debra','diane',
+  'heather','amber','denise','crystal','brittany','megan','tiffany','kelly','lauren',
+  'samantha','ashley','stephanie','nicole','victoria','allison','courtney',
+]);
+
+const MALE_NAMES = new Set([
+  'ed','drake','eminem','kanye','jay','kendrick','travis','post','lil','juice','tyler',
+  'frank','childish','chance','mac','asap','a$ap','tupac','nas','snoop','ice','dre',
+  'rakim','common','mos','talib','andre','ludacris','nelly','usher','trey','chris',
+  'miguel','weeknd','sam','shawn','charlie','harry','niall','louis','zayn','liam',
+  'john','paul','george','ringo','mick','keith','david','bruce','prince','michael',
+  'bob','james','ray','elvis','chuck','jerry','freddie','roger','pete','dave','jimmy',
+  'jimi','eric','tom','bruce','don','neil','elton','billy','barry','randy','warren',
+  'peter','simon','ryan','adam','luke','alan','mark','matt','nick','ian','noel','damon',
+  'thom','morrissey','robert','bono','sting','phil','ozzy','tony','lemmy','slash','axl',
+  'duff','steven','bobby','tommy','joey','dee','marky','johnny','sid','joe','topper',
+  'pablo','juan','carlos','jose','antonio','francisco','manuel','miguel','jorge',
+  'alejandro','pedro','rafael','sergio','mario','fernando','roberto','enrique','raúl',
+  'raul','marc','joan','jordi','pau','gerard','abel','wos','bizarrap','duki','lit',
+  'trueno','rusherking','moby','skrillex','diplo','flume','kaytranada','aphex','burial',
+  'squarepusher','tricky','perfume','frank','blood','jpegmafia','serpentwithfeet',
+  'sufjan','bon','iron','james','jon','four','mura','sohn','how','autre','conor',
+  'john','will','tame','kevin','thom','jonny','colin','phil','ed','colin',
+]);
+
+function inferGenderByName(name) {
+  const lower = name.toLowerCase().trim();
+
+  // Indicadores de grupo
+  const groupIndicators = [' & ', ' and ', ' y ', ' feat', ' vs ', ' x ', '/'];
+  for (const ind of groupIndicators) {
+    if (lower.includes(ind)) return 'group';
+  }
+
+  const tokens = lower.split(/[\s\-_\.]+/);
+  const first = tokens[0];
+
+  if (FEMALE_NAMES.has(first)) return 'female';
+  if (MALE_NAMES.has(first)) return 'male';
+
+  for (const t of tokens) {
+    if (FEMALE_NAMES.has(t)) return 'female';
+    if (MALE_NAMES.has(t)) return 'male';
+  }
+
+  return 'unknown';
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderResults(classified) {
+  const total = classified.length;
+  const counts = {};
+  GENDER_ORDER.forEach(g => counts[g] = 0);
+  classified.forEach(a => counts[a.gender] = (counts[a.gender] || 0) + 1);
+
+  // Numbers grid
+  const grid = document.getElementById('numbersGrid');
+  grid.innerHTML = '';
+  GENDER_ORDER.filter(g => counts[g] > 0).forEach(g => {
+    const pct = Math.round(counts[g] / total * 100);
+    const cell = document.createElement('div');
+    cell.className = 'number-cell';
+    cell.innerHTML = `
+      <div class="number-big" style="color:${GENDER_COLORS[g]}">${pct}%</div>
+      <div class="number-desc">${GENDER_LABELS[g]}</div>
+      <div class="number-count">${counts[g]} artista${counts[g] !== 1 ? 's' : ''}</div>`;
+    grid.appendChild(cell);
+  });
+
+  // Bars
+  const bars = document.getElementById('barsContainer');
+  bars.innerHTML = '';
+  GENDER_ORDER.filter(g => counts[g] > 0).forEach(g => {
+    const pct = Math.round(counts[g] / total * 100);
+    const row = document.createElement('div');
+    row.className = 'stat-row';
+    row.innerHTML = `
+      <span class="stat-label">${GENDER_LABELS[g]}</span>
+      <div class="bar-track"><div class="bar-fill" id="bar-${g}" style="background:${GENDER_COLORS[g]}"></div></div>
+      <span class="stat-pct">${pct}%</span>`;
+    bars.appendChild(row);
+  });
+  setTimeout(() => {
+    GENDER_ORDER.forEach(g => {
+      const bar = document.getElementById(`bar-${g}`);
+      if (bar) bar.style.width = Math.round(counts[g] / total * 100) + '%';
+    });
+  }, 100);
+
+  // Artist list
+  const list = document.getElementById('artistList');
+  list.innerHTML = '';
+  document.getElementById('artistsTitle').textContent =
+    currentTab === 'liked' ? `${total} artistas únicos en me gusta` : `Top ${total} artistas`;
+
+  const SOURCE_LABELS = { 'musicbrainz': 'MusicBrainz', 'nombre': 'por nombre ★', 'sin datos': '—' };
+  const SOURCE_TITLE  = { 'musicbrainz': 'Género declarado en MusicBrainz', 'nombre': 'Inferido por nombre de artista — dato aproximado', 'sin datos': 'Sin información disponible' };
+
+  classified.forEach(a => {
+    const row = document.createElement('div');
+    row.className = 'artist-row';
+    row.style.borderLeftColor = GENDER_COLORS[a.gender];
+    const srcLabel = SOURCE_LABELS[a.source] || '—';
+    const srcTitle = SOURCE_TITLE[a.source] || '';
+    const srcColor = a.source === 'nombre' ? 'color:var(--c-other)' : '';
+    row.innerHTML = `
+      ${a.image
+        ? `<img class="artist-img" src="${a.image}" alt="" onerror="this.style.display='none'">`
+        : `<div class="artist-img"></div>`}
+      <span class="artist-name">${escapeHtml(a.name)}</span>
+      <span class="artist-source" title="${srcTitle}" style="${srcColor}">${srcLabel}</span>
+      <span class="artist-tag" style="color:${GENDER_COLORS[a.gender]};border-color:${GENDER_COLORS[a.gender]}">${GENDER_LABELS[a.gender]}</span>`;
+    list.appendChild(row);
+  });
+
+  document.getElementById('legendEl').style.display = 'flex';
+  document.getElementById('resultsEl').classList.add('visible');
+  document.getElementById('resultsEl').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── UI ────────────────────────────────────────────────────────────────────────
+function showLoading(msg) {
+  document.getElementById('loadingText').textContent = msg;
+  document.getElementById('loadingEl').classList.add('visible');
+  document.getElementById('analyzeBtn').disabled = true;
+}
+function setLoadingText(msg) { document.getElementById('loadingText').textContent = msg; }
+function setProgress(pct) { document.getElementById('progressFill').style.width = Math.min(pct, 100) + '%'; }
+function hideLoading() {
+  document.getElementById('loadingEl').classList.remove('visible');
+  document.getElementById('analyzeBtn').disabled = false;
+}
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+function hideError() { document.getElementById('errorMsg').classList.remove('visible'); }
+</script>
+</body>
+</html>
