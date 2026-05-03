@@ -284,15 +284,16 @@ let currentLikedPeriod = 'all';
 const mbCache = new Map();
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
   const saved = localStorage.getItem('gsp_client_id');
   if (saved) document.getElementById('clientIdInput').value = saved;
 
-  const hash = window.location.hash;
-  if (hash.includes('access_token')) {
-    const params = new URLSearchParams(hash.substring(1));
-    accessToken = params.get('access_token');
-    history.replaceState(null, null, window.location.pathname);
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+
+  if (code) {
+    await exchangeCodeForToken(code);
+    window.history.replaceState({}, document.title, REDIRECT_URI);
     onLogin();
   }
 });
