@@ -57,15 +57,14 @@ button { padding:10px; margin:5px 0; cursor:pointer; }
 
 const state = {
   token: null,
-  cache: new Map(),
   counts: { female:0, male:0, group:0, unknown:0 }
 };
 
-/* ================= CONFIG FIJA ================= */
+/* ================= CONFIG ================= */
 
 const REDIRECT_URI = "https://dm1ans.github.io/spotisplit/spotify-gender-analyzer.html";
 
-/* ================= HELPERS PKCE ================= */
+/* ================= PKCE ================= */
 
 function randomString(len){
   const arr = new Uint8Array(len);
@@ -113,44 +112,47 @@ async function login(){
 window.onload = async () => {
 
   const code = new URLSearchParams(location.search).get("code");
-
   if(!code) return;
 
   const cid = localStorage.getItem("cid");
   const verifier = localStorage.getItem("verifier");
 
-  const body = new URLSearchParams({
-    client_id: cid,
-    grant_type: "authorization_code",
-    code,
-    redirect_uri: REDIRECT_URI,
-    code_verifier: verifier
-  });
+  const body = new URLSearchParams();
+  body.append("client_id", cid);
+  body.append("grant_type", "authorization_code");
+  body.append("code", code);
+  body.append("redirect_uri", REDIRECT_URI);
+  body.append("code_verifier", verifier);
 
-  const r = await fetch("https://accounts.spotify.com/api/token", {
-    method:"POST",
-    headers: {
-      "Content-Type":"application/x-www-form-urlencoded"
-    },
-    body
-  });
+  try {
 
-  const data = await r.json();
+    const r = await fetch("https://accounts.spotify.com/api/token", {
+      method:"POST",
+      headers:{ "Content-Type":"application/x-www-form-urlencoded" },
+      body
+    });
 
-  console.log("AUTH:", data);
+    const data = await r.json();
 
-  if(!data.access_token){
-    document.getElementById("status").innerText =
-      "Error login Spotify (mirar consola)";
-    return;
+    console.log("TOKEN:", data);
+
+    if(!r.ok || !data.access_token){
+      document.getElementById("status").innerText =
+        "Error login Spotify: " + (data.error || "unknown");
+      return;
+    }
+
+    state.token = data.access_token;
+
+    history.replaceState({},document.title,location.pathname);
+
+    document.getElementById("dash").style.display="block";
+    document.getElementById("status").innerText="Conectado";
+
+  } catch(e){
+    console.error(e);
+    document.getElementById("status").innerText="Error network";
   }
-
-  state.token = data.access_token;
-
-  history.replaceState({},document.title,location.pathname);
-
-  document.getElementById("dash").style.display="block";
-  document.getElementById("status").innerText="Conectado";
 };
 
 /* ================= API ================= */
@@ -163,53 +165,82 @@ async function api(url){
   return r.json();
 }
 
-/* ================= RUN ================= */
+/* ================= RUN (PAGINATED) ================= */
 
 async function run(range){
 
-  state.counts = {female:0,male:0,group:0,unknown:0};
+  state.counts = { female:0, male:0, group:0, unknown:0 };
 
-  document.getElementById("grid").innerHTML="";
+  document.getElementById("grid").innerHTML = "";
 
-  const data = await api(`/me/top/artists?limit=50&time_range=${range}`);
+  let offset = 0;
+  const limit = 50;
+  let all = [];
 
-  for(const a of data.items){
+  while(true){
 
-    const g = classify(a.name);
+    const data = await api(
+      `/me/top/artists?limit=${limit}&offset=${offset}&time_range=${range}`
+    );
+
+    if(!data.items || data.items.length === 0) break;
+
+    all = all.concat(data.items);
+
+    offset += limit;
+
+    if(data.items.length < limit) break;
+  }
+
+  for(const a of all){
+
+    const g = classify(a.name, a);
 
     state.counts[g]++;
 
-    render(a.name,g);
-
+    render(a.name, g);
     update();
   }
 }
 
-/* ================= CLASSIFY ================= */
+/* ================= CLASSIFIER ================= */
 
-function classify(name){
+function classify(name, artist){
 
-  const n = name.toLowerCase();
+  const n = name.toLowerCase().replace(/\s+/g," ");
 
-  const f = ["billie","adele","rihanna","rosalia","dua","sza"];
-  const m = ["drake","eminem","kendrick","kanye","post"];
+  const female = [
+    "billie","adele","rihanna","rosalia","dua lipa",
+    "sza","lorde","miley","ariana","shakira","lizzo"
+  ];
 
-  if(f.some(x=>n.includes(x))) return "female";
-  if(m.some(x=>n.includes(x))) return "male";
+  const male = [
+    "drake","eminem","kendrick","kanye","post malone",
+    "the weeknd","frank ocean","travis scott","bad bunny"
+  ];
+
+  if(female.some(x => n.includes(x))) return "female";
+  if(male.some(x => n.includes(x))) return "male";
+
+  // group heuristics
+  if(n.includes("&") || n.includes(" and ")) return "group";
+
+  if(artist && artist.genres && artist.genres.length > 2)
+    return "group";
 
   return "unknown";
 }
 
 /* ================= UI ================= */
 
-function render(name,g){
+function render(name, g){
 
   const el = document.getElementById("grid");
 
   const d = document.createElement("div");
-  d.className="card";
+  d.className = "card";
 
-  d.innerHTML=`
+  d.innerHTML = `
     <div>${name}</div>
     <div class="small">${g}</div>
   `;
@@ -221,7 +252,7 @@ function update(){
 
   const c = state.counts;
 
-  document.getElementById("counter").innerHTML=`
+  document.getElementById("counter").innerHTML = `
     <div>♀ ${c.female}</div>
     <div>♂ ${c.male}</div>
     <div>👥 ${c.group}</div>
