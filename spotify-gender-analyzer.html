@@ -12,12 +12,7 @@ body { margin:0; background:#0a0a0a; color:#eaeaea; font-family:DM Mono; }
 .app { max-width:1100px; margin:auto; padding:40px; }
 h1 { font-family:Bebas Neue; font-size:64px; }
 
-.panel {
-  background:#111;
-  padding:20px;
-  border:1px solid #222;
-  margin-bottom:20px;
-}
+.panel { background:#111; padding:20px; border:1px solid #222; margin-bottom:20px; }
 
 button {
   background:#1db954;
@@ -41,8 +36,25 @@ button {
 
 .small { font-size:12px; color:#888; }
 
-.bar { height:6px; background:#222; margin-top:6px; }
-.fill { height:100%; background:#1db954; width:0%; }
+.bar {
+  height:6px;
+  background:#222;
+  margin-top:6px;
+  overflow:hidden;
+}
+
+.fill {
+  height:100%;
+  background:#1db954;
+  width:0%;
+  transition:width .3s;
+}
+
+.progress {
+  margin:10px 0;
+  font-size:12px;
+  color:#aaa;
+}
 </style>
 </head>
 
@@ -52,7 +64,7 @@ button {
 
 <h1>GENDER SPLIT</h1>
 
-<div class="panel" id="auth">
+<div class="panel">
   <input id="clientId" placeholder="Spotify Client ID" style="width:100%;padding:10px;">
   <button onclick="login()">Conectar</button>
   <div id="status"></div>
@@ -60,17 +72,11 @@ button {
 
 <div id="dashboard" style="display:none">
 
-  <div>
-    <button onclick="analyzeTop('short_term')">Último mes</button>
-    <button onclick="analyzeTop('medium_term')">6 meses</button>
-    <button onclick="analyzeTop('long_term')">1 año</button>
-  </div>
+  <button onclick="analyze('short_term')">Último mes</button>
+  <button onclick="analyze('medium_term')">6 meses</button>
+  <button onclick="analyze('long_term')">1 año</button>
 
-  <div style="margin-top:10px;">
-    <button onclick="analyzeLiked()">Me gusta</button>
-  </div>
-
-  <div id="progress" class="small"></div>
+  <div class="progress" id="progressText"></div>
 
   <div class="grid" id="results"></div>
 
@@ -81,7 +87,7 @@ button {
 <script>
 
 /* =========================
-   STATE
+   STATE + CACHE
 ========================= */
 
 const state = {
@@ -89,71 +95,67 @@ const state = {
   cache: new Map()
 };
 
+function loadCache() {
+  try {
+    const raw = localStorage.getItem("gender_cache");
+    if (raw) state.cache = new Map(JSON.parse(raw));
+  } catch {}
+}
+
+function saveCache() {
+  localStorage.setItem(
+    "gender_cache",
+    JSON.stringify(Array.from(state.cache.entries()))
+  );
+}
+
+loadCache();
+
 /* =========================
-   CONFIG
+   LOGIN SPOTIFY
 ========================= */
 
-const REDIRECT_URI =
-  "https://dm1ans.github.io/spotisplit/spotify-gender-analyzer.html";
+function login() {
+  const cid = document.getElementById("clientId").value;
+  localStorage.setItem("cid", cid);
 
-const SCOPES =
-  "user-top-read user-library-read user-read-private";
+  const redirect = location.href.split("?")[0];
 
-/* =========================
-   LOGIN PKCE
-========================= */
+  const url =
+    "https://accounts.spotify.com/authorize" +
+    "?client_id=" + cid +
+    "&response_type=token" +
+    "&redirect_uri=" + encodeURIComponent(redirect) +
+    "&scope=user-top-read user-library-read";
 
-async function login() {
-
-  const clientId = document.getElementById("clientId").value;
-  localStorage.setItem("cid", clientId);
-
-  const verifier = cryptoRandom();
-  const challenge = await sha256(verifier);
-
-  localStorage.setItem("verifier", verifier);
-
-  const params = new URLSearchParams({
-    client_id: clientId,
-    response_type: "code",
-    redirect_uri: REDIRECT_URI,
-    scope: SCOPES,
-    code_challenge_method: "S256",
-    code_challenge: challenge
-  });
-
-  window.location.href =
-    "https://accounts.spotify.com/authorize?" + params;
+  window.location.href = url;
 }
 
 /* =========================
-   CALLBACK
+   TOKEN HANDLER
 ========================= */
 
-window.onload = async () => {
+window.onload = () => {
+  const hash = location.hash;
 
-  const code = new URLSearchParams(location.search).get("code");
+  if (hash.includes("access_token")) {
+    state.token = new URLSearchParams(hash.substring(1)).get("access_token");
 
-  if (code) {
-
-    const token = await exchange(code);
-
-    state.token = token;
-    window.token = token;
-
-    document.getElementById("auth").style.display = "none";
     document.getElementById("dashboard").style.display = "block";
 
     setStatus("Conectado");
   }
 };
 
+function setStatus(t) {
+  document.getElementById("status").innerText = t;
+}
+
 /* =========================
    SPOTIFY API
 ========================= */
 
 async function api(path) {
-
   const r = await fetch("https://api.spotify.com/v1" + path, {
     headers: { Authorization: "Bearer " + state.token }
   });
@@ -162,93 +164,72 @@ async function api(path) {
 }
 
 /* =========================
-   TOP ARTISTS (FILTRO TIEMPO)
+   MAIN ANALYSIS
 ========================= */
 
-async function analyzeTop(range) {
-
-  setProgress("Cargando top artistas...");
+async function analyze(range) {
 
   const data = await api(`/me/top/artists?limit=50&time_range=${range}`);
 
-  const classified = await classifyBatch(data.items);
+  const list = data.items.map(a => a.name);
 
-  render(classified);
+  document.getElementById("results").innerHTML = "";
+
+  await classifyIncremental(list);
 }
 
 /* =========================
-   LIKED SONGS (POR FECHA)
+   INCREMENTAL CLASSIFICATION
 ========================= */
 
-async function analyzeLiked() {
+async function classifyIncremental(list) {
 
-  setProgress("Cargando me gusta...");
+  const concurrency = 6;
+  let index = 0;
 
-  let offset = 0;
-  let all = [];
-  let stop = false;
+  async function worker() {
 
-  while (!stop) {
+    while (index < list.length) {
 
-    const data = await api(`/me/tracks?limit=50&offset=${offset}`);
+      const i = index++;
+      const name = list[i];
 
-    for (const item of data.items) {
+      setProgress(i, list.length);
 
-      all.push({
-        name: item.track.artists[0].name
-      });
+      const gender = await classify(name);
+
+      renderOne({ name, gender });
     }
-
-    offset += 50;
-
-    if (!data.next || offset > 500) stop = true;
   }
 
-  const classified = await classifyBatch(all);
+  await Promise.all(
+    Array.from({ length: concurrency }, worker)
+  );
 
-  render(classified);
+  saveCache();
 }
 
 /* =========================
-   BATCH OPTIMIZADO
-========================= */
-
-async function classifyBatch(list) {
-
-  const out = [];
-
-  for (let i = 0; i < list.length; i++) {
-
-    setProgress(`Analizando ${i+1}/${list.length}`);
-
-    out.push(await classify(list[i].name));
-  }
-
-  return out;
-}
-
-/* =========================
-   CLASSIFICATION PIPELINE
+   CLASSIFY PIPELINE
 ========================= */
 
 async function classify(name) {
 
   const key = name.toLowerCase();
 
-  if (state.cache.has(key))
+  if (state.cache.has(key)) {
     return state.cache.get(key);
-
-  let gender = await musicbrainz(name);
-
-  if (gender === "unknown") {
-    gender = spotifyFallback(name);
   }
 
-  const res = { name, gender };
+  let g = await musicbrainz(name);
 
-  state.cache.set(key, res);
+  if (g === "unknown") {
+    g = spotifyFallback(name);
+  }
 
-  return res;
+  state.cache.set(key, g);
+
+  return g;
 }
 
 /* =========================
@@ -263,7 +244,7 @@ async function musicbrainz(name) {
       `https://musicbrainz.org/ws/2/artist/?query=artist:"${encodeURIComponent(name)}"&fmt=json&limit=1`;
 
     const r = await fetch(url, {
-      headers: { "User-Agent": "GenderSplitApp/1.0" }
+      headers: { "User-Agent": "GenderSplitApp" }
     });
 
     const d = await r.json();
@@ -286,15 +267,15 @@ async function musicbrainz(name) {
 }
 
 /* =========================
-   SPOTIFY FALLBACK
+   FALLBACK SPOTIFY
 ========================= */
 
 function spotifyFallback(name) {
 
   const n = name.toLowerCase();
 
-  const female = ["adele","rihanna","billie","beyonce","rosalia"];
-  const male = ["drake","eminem","kanye","post","kendrick"];
+  const female = ["billie","adele","rihanna","beyonce","rosalia"];
+  const male = ["drake","eminem","kendrick","kanye","post"];
 
   if (female.some(x => n.includes(x))) return "female";
   if (male.some(x => n.includes(x))) return "male";
@@ -306,76 +287,37 @@ function spotifyFallback(name) {
    RENDER
 ========================= */
 
-function render(list) {
+function renderOne(item) {
 
   const el = document.getElementById("results");
 
-  el.innerHTML = "";
+  const div = document.createElement("div");
+  div.className = "card";
 
-  const count = { male:0, female:0, group:0, unknown:0 };
+  div.innerHTML = `
+    <div>${item.name}</div>
+    <div class="small">${item.gender}</div>
+    <div class="bar"><div class="fill" style="width:100%"></div></div>
+  `;
 
-  list.forEach(a => count[a.gender]++);
-
-  for (let k in count) {
-
-    const pct = Math.round(count[k] / list.length * 100);
-
-    el.innerHTML += `
-      <div class="card">
-        <div>${k}</div>
-        <div class="small">${count[k]} artistas</div>
-        <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
-      </div>
-    `;
-  }
+  el.appendChild(div);
 }
 
 /* =========================
-   TOKEN EXCHANGE
+   PROGRESS
 ========================= */
 
-async function exchange(code){
-
-  const cid = localStorage.getItem("cid");
-  const verifier = localStorage.getItem("verifier");
-
-  const body = new URLSearchParams({
-    client_id: cid,
-    grant_type:"authorization_code",
-    code,
-    redirect_uri: REDIRECT_URI,
-    code_verifier: verifier
-  });
-
-  const r = await fetch("https://accounts.spotify.com/api/token", {
-    method:"POST",
-    headers:{ "Content-Type":"application/x-www-form-urlencoded" },
-    body
-  });
-
-  const j = await r.json();
-
-  return j.access_token;
+function setProgress(i, total) {
+  document.getElementById("progressText").innerText =
+    `Analizando ${i + 1} / ${total}`;
 }
 
 /* =========================
    HELPERS
 ========================= */
 
-function setProgress(t){ document.getElementById("progress").innerText = t; }
-function setStatus(t){ document.getElementById("status").innerText = t; }
-function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
-
-function cryptoRandom(){
-  return [...crypto.getRandomValues(new Uint8Array(64))]
-    .map(x=>x.toString(16)).join("");
-}
-
-async function sha256(v){
-  const b = new TextEncoder().encode(v);
-  const d = await crypto.subtle.digest("SHA-256", b);
-  return btoa(String.fromCharCode(...new Uint8Array(d)))
-    .replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+function wait(ms){
+  return new Promise(r => setTimeout(r, ms));
 }
 
 </script>
