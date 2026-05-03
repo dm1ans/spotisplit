@@ -217,19 +217,41 @@ async function exchangeCodeForToken(code) {
 async function onLogin() {
 
   document.querySelector(".panel").innerHTML =
-    "<h2>Login correcto</h2><p>Cargando usuario...</p>";
+    "<h2>Login correcto</h2><p>Cargando datos de Spotify...</p>";
 
-  const me = await fetch("https://api.spotify.com/v1/me", {
-    headers: {
-      Authorization: "Bearer " + accessToken
-    }
-  }).then(r => r.json());
+  try {
+    // 1. Usuario
+    const me = await fetch("https://api.spotify.com/v1/me", {
+      headers: {
+        Authorization: "Bearer " + accessToken
+      }
+    }).then(r => r.json());
 
-  console.log("USER:", me);
+    // 2. Top artistas (esto ya te abre el camino a tu app)
+    const topArtists = await fetch(
+      "https://api.spotify.com/v1/me/top/artists?limit=10",
+      {
+        headers: {
+          Authorization: "Bearer " + accessToken
+        }
+      }
+    ).then(r => r.json());
 
-  document.querySelector(".panel").innerHTML =
-    `<h2>Login correcto</h2>
-     <p>Usuario: ${me.display_name || me.id}</p>`;
+    console.log("USER:", me);
+    console.log("TOP ARTISTS:", topArtists);
+
+    // 3. Mostrar en pantalla
+    document.querySelector(".panel").innerHTML = `
+      <h2>Login correcto</h2>
+      <p><b>${me.display_name || me.id}</b></p>
+      <p>Top artistas cargados: ${topArtists.items.length}</p>
+    `;
+
+  } catch (e) {
+    console.error(e);
+    document.querySelector(".panel").innerHTML =
+      "<h2>Error cargando datos de Spotify</h2>";
+  }
 }
 
 // ======================
