@@ -17,7 +17,6 @@
   --text:          #e8e8e8;
   --muted:         #555555;
   --accent:        #1db954;
-
   --c-female:      #ff6b9d;
   --c-male:        #4a9eff;
   --c-nb:          #f4c430;
@@ -42,14 +41,12 @@ body::before {
 
 .app { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 48px 24px 100px; }
 
-/* HEADER */
 header { margin-bottom: 52px; }
 .logo-row { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 10px; flex-wrap: wrap; }
 h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px,12vw,96px); letter-spacing: 3px; line-height: .95; }
 .badge { font-size: 10px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; border: 1px solid var(--accent); padding: 4px 10px; margin-bottom: 8px; white-space: nowrap; }
 .subtitle { font-size: 12px; color: var(--muted); line-height: 1.8; max-width: 520px; }
 
-/* CONFIG */
 .config-panel { background: var(--surface); border: 1px solid var(--border); padding: 28px; margin-bottom: 28px; }
 .field-label { font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
 .field-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; padding: 12px 14px; outline: none; transition: border-color .2s; }
@@ -61,7 +58,6 @@ h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px,12vw,96px); le
 .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: var(--accent); color: #000; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; border: none; padding: 14px 28px; cursor: pointer; width: 100%; margin-top: 20px; transition: opacity .2s, transform .15s; }
 .btn-primary:hover { opacity: .85; transform: translateY(-1px); }
 
-/* USER CARD */
 .user-card { display: none; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border); padding: 14px 20px; margin-bottom: 28px; }
 .user-card.on { display: flex; }
 .user-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); flex-shrink: 0; }
@@ -72,31 +68,32 @@ h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px,12vw,96px); le
 .btn-small.accent:hover { border-color: var(--accent); color: var(--accent); }
 .ml-auto { margin-left: auto; }
 
-/* ERROR */
+/* CACHED RESULTS BANNER */
+.cached-banner { display: none; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 14px 20px; margin-bottom: 24px; font-size: 12px; gap: 16px; align-items: center; flex-wrap: wrap; }
+.cached-banner.on { display: flex; }
+.cached-info { flex: 1; }
+.cached-date { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-top: 3px; }
+
 .error-box { display: none; background: #1a0a0a; border: 1px solid #550000; color: #ff7070; font-size: 12px; padding: 14px 18px; margin-bottom: 24px; line-height: 1.7; }
 .error-box.on { display: block; }
 
-/* TABS */
 .tabs { display: none; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
 .tabs.on { display: flex; }
 .tab { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); background: none; border: none; border-bottom: 2px solid transparent; padding: 12px 20px; cursor: pointer; transition: color .2s, border-color .2s; margin-bottom: -1px; }
 .tab:hover { color: var(--text); }
 .tab.active { color: var(--text); border-bottom-color: var(--accent); }
 
-/* FILTERS */
 .filters { display: none; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
 .filters.on { display: flex; }
 .fbtn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--border); padding: 8px 16px; cursor: pointer; transition: all .2s; }
 .fbtn:hover { border-color: var(--muted); color: var(--text); }
 .fbtn.active { border-color: var(--accent); color: var(--accent); }
 
-/* ANALYZE */
 .btn-analyze { display: none; align-items: center; gap: 10px; background: none; border: 1px solid var(--text); color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 24px; cursor: pointer; transition: background .2s, color .2s; margin-bottom: 36px; }
 .btn-analyze.on { display: inline-flex; }
 .btn-analyze:hover { background: var(--text); color: var(--bg); }
 .btn-analyze:disabled { opacity: .3; cursor: not-allowed; background: none; color: var(--text); }
 
-/* LOADING */
 .loading { display: none; flex-direction: column; gap: 10px; margin-bottom: 36px; }
 .loading.on { display: flex; }
 .loading-row { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--muted); }
@@ -106,23 +103,33 @@ h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px,12vw,96px); le
 .progress-fill { height: 100%; background: var(--accent); width: 0; transition: width .4s; }
 .loading-note { font-size: 10px; color: var(--muted); font-style: italic; }
 
-/* RESULTS */
 .results { display: none; }
 .results.on { display: block; }
 
-/* CHART VIEW TOGGLE */
+/* CONTEXT COMPARISON */
+.context-box { background: var(--surface); border: 1px solid var(--border); padding: 20px 24px; margin-bottom: 32px; }
+.context-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+.context-rows { display: flex; flex-direction: column; gap: 10px; }
+.context-row { display: grid; grid-template-columns: 180px 1fr 52px; align-items: center; gap: 12px; }
+.context-label { font-size: 10px; color: var(--muted); text-align: right; }
+.context-bar-track { height: 4px; background: var(--border); overflow: hidden; position: relative; }
+.context-bar-fill { height: 100%; transition: width 1.2s cubic-bezier(.22,1,.36,1); }
+.context-pct { font-size: 11px; text-align: right; }
+.context-note { font-size: 10px; color: var(--muted); margin-top: 12px; line-height: 1.7; }
+.context-note a { color: var(--accent); text-decoration: none; }
+.context-note a:hover { text-decoration: underline; }
+
+/* CHART TOGGLE */
 .chart-toggle { display: flex; gap: 8px; margin-bottom: 20px; }
 .chart-view-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--border); padding: 7px 14px; cursor: pointer; transition: all .2s; }
 .chart-view-btn.active { border-color: var(--accent); color: var(--accent); }
 
-/* NUMBERS GRID */
 .numbers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin-bottom: 36px; }
 .num-cell { background: var(--surface); padding: 20px 14px; text-align: center; }
 .num-big { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1; margin-bottom: 4px; }
 .num-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
 .num-count { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
-/* BARS */
 .bar-section-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; margin-top: 4px; }
 .bar-row { display: grid; grid-template-columns: 140px 1fr 52px; align-items: center; gap: 14px; margin-bottom: 10px; }
 .bar-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-align: right; }
@@ -131,43 +138,51 @@ h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px,12vw,96px); le
 .bar-pct { font-size: 12px; text-align: right; }
 .bars-divider { height: 1px; background: var(--border); margin: 24px 0; }
 
-/* SECTION TITLE */
 .section-title { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 40px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
 .section-action { font-size: 9px; letter-spacing: 2px; color: var(--accent); cursor: pointer; border: 1px solid var(--accent); padding: 3px 10px; transition: all .2s; background: none; font-family: 'DM Mono', monospace; text-transform: uppercase; }
 .section-action:hover { background: var(--accent); color: #000; }
 
-/* ARTIST LIST */
 .artist-list { display: flex; flex-direction: column; gap: 2px; }
 .artist-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface); border-left: 3px solid transparent; transition: background .15s; }
 .artist-row:hover { background: var(--surface2); }
-.artist-row.needs-edit { border-left-color: var(--muted) !important; opacity: .7; }
-.artist-row.needs-edit:hover { opacity: 1; }
+.artist-row.needs-edit { opacity: .65; }
 .artist-thumb { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: var(--border); flex-shrink: 0; }
 .artist-thumb-empty { width: 34px; height: 34px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
 .artist-name { font-size: 12px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* TAGS */
-.tags { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+.tags { display: flex; gap: 5px; align-items: center; flex-shrink: 0; flex-wrap: wrap; }
 .tag { font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; padding: 2px 7px; border: 1px solid; white-space: nowrap; }
-.tag.type  { color: var(--muted); border-color: var(--border); }
-.tag.gender { /* color set inline */ }
+.tag.type { color: var(--muted); border-color: var(--border); }
 
-/* SOURCE PILLS */
 .sources { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
 .src-pill { font-size: 8px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 6px; border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
 .src-pill.hit { border-color: var(--accent); color: var(--accent); }
-.src-pill.community { border-color: #1db954; color: #1db954; }
+.src-pill.community { border-color: var(--accent); color: var(--accent); }
 .src-pill.inferred { border-color: var(--c-fluid); color: var(--c-fluid); }
 
-/* EDIT BTN */
 .btn-edit { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 7px; cursor: pointer; transition: all .2s; white-space: nowrap; flex-shrink: 0; }
 .btn-edit:hover { border-color: var(--accent); color: var(--accent); }
 
-/* LEGEND */
 .legend { display: none; flex-wrap: wrap; gap: 12px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 32px; }
 .legend.on { display: flex; }
 .legend-item { display: flex; align-items: center; gap: 6px; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
 .legend-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* SPOTIFY EQUAL SECTION */
+.equal-section { margin-top: 60px; border-top: 1px solid var(--border); padding-top: 40px; }
+.equal-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+.equal-title-block { flex: 1; }
+.equal-eyebrow { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.equal-title { font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 2px; line-height: 1; margin-bottom: 12px; }
+.equal-body { font-size: 12px; color: var(--muted); line-height: 1.8; max-width: 540px; }
+.equal-body a { color: var(--accent); text-decoration: none; }
+.equal-body a:hover { text-decoration: underline; }
+.equal-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); margin-bottom: 28px; }
+.equal-stat { background: var(--surface); padding: 18px 14px; text-align: center; }
+.equal-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--c-female); line-height: 1; margin-bottom: 4px; }
+.equal-stat-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); line-height: 1.4; }
+.equal-playlist-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.equal-playlist-wrap { border: 1px solid var(--border); overflow: hidden; }
 
 /* MODAL */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.88); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
@@ -175,27 +190,21 @@ h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px,12vw,96px); le
 .modal { background: var(--surface); border: 1px solid var(--border); padding: 28px; width: 100%; max-width: 460px; }
 .modal-nav { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-bottom: 16px; }
 .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; margin-bottom: 4px; }
-.modal-artist { font-size: 13px; color: var(--text); margin-bottom: 24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-.modal-section { margin-bottom: 20px; }
-.modal-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-
-/* SELECTS */
+.modal-artist { font-size: 13px; margin-bottom: 24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.modal-section { margin-bottom: 18px; }
+.modal-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 .modal-select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 10px 12px; outline: none; cursor: pointer; transition: border-color .2s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23555'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
 .modal-select:focus { border-color: var(--accent); }
+.modal-select:disabled { opacity: .35; cursor: not-allowed; }
 .modal-select option { background: var(--surface); }
-
-/* GROUP COMPOSITION (hidden unless group) */
 .composition-section { display: none; }
 .composition-section.on { display: block; }
-
-.modal-actions { display: flex; gap: 10px; margin-top: 24px; }
-.btn-save { flex: 1; background: var(--accent); color: #000; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; border: none; padding: 12px; cursor: pointer; transition: opacity .2s; }
+.modal-actions { display: flex; gap: 8px; margin-top: 24px; flex-wrap: wrap; }
+.btn-save { flex: 1; background: var(--accent); color: #000; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; border: none; padding: 12px; cursor: pointer; transition: opacity .2s; min-width: 120px; }
 .btn-save:hover { opacity: .85; }
-.btn-save:disabled { opacity: .4; cursor: not-allowed; }
-.btn-skip { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 16px; cursor: pointer; transition: all .2s; }
+.btn-skip { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 14px; cursor: pointer; transition: all .2s; }
 .btn-skip:hover { border-color: var(--text); color: var(--text); }
-.btn-close-modal { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 16px; cursor: pointer; transition: all .2s; }
+.btn-close-modal { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 14px; cursor: pointer; transition: all .2s; }
 .btn-close-modal:hover { border-color: var(--text); color: var(--text); }
 
 /* ADMIN */
@@ -207,6 +216,7 @@ h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px,12vw,96px); le
 .admin-stat { background: var(--surface); padding: 16px 20px; flex: 1; text-align: center; }
 .admin-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--accent); }
 .admin-stat-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+.admin-empty { font-size: 12px; color: var(--muted); padding: 24px; text-align: center; border: 1px solid var(--border); }
 .admin-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .admin-table th { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
 .admin-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
@@ -219,7 +229,8 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
 @media (max-width: 600px) {
   .numbers-grid { grid-template-columns: repeat(2,1fr); }
   .bar-row { grid-template-columns: 100px 1fr 40px; }
-  .bar-label { font-size: 9px; }
+  .context-row { grid-template-columns: 140px 1fr 44px; }
+  .equal-stats { grid-template-columns: repeat(2,1fr); }
 }
 </style>
 </head>
@@ -258,6 +269,16 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
     </div>
     <button class="btn-small accent ml-auto" onclick="openAdmin()">Admin</button>
     <button class="btn-small" onclick="logout()">Salir</button>
+  </div>
+
+  <!-- CACHED BANNER -->
+  <div class="cached-banner" id="cachedBanner">
+    <div class="cached-info">
+      <div id="cachedLabel">Último análisis guardado</div>
+      <div class="cached-date" id="cachedDate">—</div>
+    </div>
+    <button class="btn-small" onclick="loadCached()">Restaurar</button>
+    <button class="btn-small" onclick="clearCached()">Borrar</button>
   </div>
 
   <div class="error-box" id="errorBox"></div>
@@ -307,18 +328,71 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
   </div>
 
   <div class="results" id="resultsEl">
+    <!-- CONTEXT: comparación con promedios -->
+    <div class="context-box" id="contextBox">
+      <div class="context-title">Tu escucha vs. promedios globales</div>
+      <div class="context-rows" id="contextRows"></div>
+      <div class="context-note">
+        Datos de referencia: <a href="https://everynoise.com/gender_tldr.html" target="_blank">Everynoise / Spotify Research</a> —
+        el promedio global en Spotify es 23% streams de artistas femeninas.
+        Oyentes mujeres: ~32% · Oyentes hombres: ~19%.
+        <a href="https://research.atspotify.com/publications/artist-gender-representation-in-music-streaming" target="_blank">Ver estudio completo →</a>
+      </div>
+    </div>
+
     <div class="chart-toggle">
       <button class="chart-view-btn active" id="cv-separate" onclick="setChartView('separate')">Separado</button>
       <button class="chart-view-btn" id="cv-combined" onclick="setChartView('combined')">Combinado</button>
     </div>
     <div class="numbers-grid" id="numbersGrid"></div>
     <div id="barsContainer"></div>
+
     <div class="section-title">
       <span id="artistsTitle">Artistas</span>
       <button class="section-action" id="editAllBtn" onclick="startEditQueue()">Corregir sin datos →</button>
     </div>
     <div class="artist-list" id="artistList"></div>
-  </div>
+
+    <!-- SPOTIFY EQUAL -->
+    <div class="equal-section">
+      <div class="equal-eyebrow">Contexto</div>
+      <div class="equal-title">Spotify Equal</div>
+      <div class="equal-body" style="margin-bottom:24px">
+        Spotify Equal es un programa global que busca amplificar la visibilidad de artistas mujeres e identidades no binarias en la plataforma.
+        Cada mes presenta una playlist con artistas de todo el mundo, les otorga un badge en su perfil y las incluye en campañas editoriales.
+        El programa nació como respuesta a la brecha de representación: solo el <strong style="color:var(--c-female)">23%</strong> de los streams globales en Spotify corresponden a artistas femeninas,
+        a pesar de que el <strong>44%</strong> de los oyentes son mujeres.
+        <br><br>
+        <a href="https://imusician.pro/en/resources/blog/spotify-equal-program-women-in-music" target="_blank">Leer más sobre Spotify Equal →</a>
+      </div>
+
+      <div class="equal-stats">
+        <div class="equal-stat">
+          <div class="equal-stat-num">23%</div>
+          <div class="equal-stat-label">de streams son de artistas femeninas</div>
+        </div>
+        <div class="equal-stat">
+          <div class="equal-stat-num">44%</div>
+          <div class="equal-stat-label">de los oyentes de Spotify son mujeres</div>
+        </div>
+        <div class="equal-stat">
+          <div class="equal-stat-num">19%</div>
+          <div class="equal-stat-label">streams de artistas femeninas entre oyentes hombres</div>
+        </div>
+      </div>
+
+      <div class="equal-playlist-title">Playlist Spotify Equal — este mes</div>
+      <div class="equal-playlist-wrap">
+        <iframe
+          src="https://open.spotify.com/embed/playlist/37i9dQZF1DX6lKsb31j18u?utm_source=generator&theme=0"
+          width="100%" height="352" frameborder="0" allowfullscreen=""
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy" style="display:block">
+        </iframe>
+      </div>
+    </div>
+
+  </div><!-- /results -->
 
   <!-- ADMIN -->
   <div class="admin-panel" id="adminPanel">
@@ -331,19 +405,15 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
       <div class="admin-stat"><div class="admin-stat-num" id="adminVerified">—</div><div class="admin-stat-label">Verificados</div></div>
       <div class="admin-stat"><div class="admin-stat-num" id="adminUnknown">—</div><div class="admin-stat-label">Sin datos</div></div>
     </div>
-    <table class="admin-table">
-      <thead><tr><th>Artista</th><th>Tipo</th><th>Género</th><th>Fuente</th><th>✓</th><th>Fecha</th><th></th></tr></thead>
-      <tbody id="adminTableBody"></tbody>
-    </table>
+    <div id="adminContent"></div>
   </div>
 
   <!-- MODAL -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-      <div class="modal-nav" id="modalNav">— / —</div>
+      <div class="modal-nav" id="modalNav">—</div>
       <div class="modal-title">EDITAR</div>
       <div class="modal-artist" id="modalArtistName">—</div>
-
       <div class="modal-section">
         <div class="modal-label">Tipo</div>
         <select class="modal-select" id="selectType" onchange="onTypeChange()">
@@ -351,7 +421,6 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
           <option value="group">Grupo / Banda</option>
         </select>
       </div>
-
       <div class="modal-section">
         <div class="modal-label">Género</div>
         <select class="modal-select" id="selectGender">
@@ -368,18 +437,16 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
           <option value="unknown">Sin datos</option>
         </select>
       </div>
-
       <div class="modal-section composition-section" id="compositionSection">
         <div class="modal-label">Composición del grupo</div>
         <select class="modal-select" id="selectComposition">
           <option value="majority-female">Mayoría mujeres</option>
           <option value="majority-male">Mayoría hombres</option>
           <option value="mixed">Mixto</option>
-          <option value="majority-nb">Mayoría no binario/queer</option>
+          <option value="majority-nb">Mayoría no binario / queer</option>
           <option value="unknown">Sin datos de composición</option>
         </select>
       </div>
-
       <div class="modal-actions">
         <button class="btn-save" id="btnSave" onclick="saveEdit()">Guardar y siguiente</button>
         <button class="btn-skip" onclick="skipEdit()">Saltar</button>
@@ -389,14 +456,15 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
   </div>
 
   <footer>
-    Gender Split — Spotify + MusicBrainz + TheAudioDB + base colaborativa.<br>
-    ★ = inferido por nombre · ✓ = verificado · MusicBrainz / TheAudioDB = fuente declarada
+    Gender Split — Spotify Web API + MusicBrainz + TheAudioDB + base colaborativa.<br>
+    ★ = inferido por nombre · ✓ = verificado · MB = MusicBrainz · TADB = TheAudioDB<br>
+    Datos de contexto: Spotify Research / Everynoise.com
   </footer>
 
 </div>
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
-// AIRTABLE
+// CONFIG
 // ─────────────────────────────────────────────────────────────────────────────
 const AT_BASE    = 'appmlFpQILICQWOnz';
 const AT_TABLE   = 'artists';
@@ -404,32 +472,32 @@ const AT_TOKEN   = 'patrwa42Tl8zqf2fm';
 const AT_URL     = `https://api.airtable.com/v0/${AT_BASE}/${AT_TABLE}`;
 const AT_HEADERS = { 'Authorization': `Bearer ${AT_TOKEN}`, 'Content-Type': 'application/json' };
 
+const LS_KEY     = 'gsp_results_v3'; // versión del cache local
+
 // ─────────────────────────────────────────────────────────────────────────────
 // GÉNERO CONFIG
 // ─────────────────────────────────────────────────────────────────────────────
 const GENDER_CFG = {
-  'female':           { label: 'Mujer',          color: 'var(--c-female)' },
-  'male':             { label: 'Hombre',          color: 'var(--c-male)' },
-  'non-binary':       { label: 'No binario',      color: 'var(--c-nb)' },
-  'trans-woman':      { label: 'Mujer trans',     color: 'var(--c-trans-woman)' },
-  'trans-man':        { label: 'Hombre trans',    color: 'var(--c-trans-man)' },
-  'intersex':         { label: 'Intersex',        color: 'var(--c-intersex)' },
-  'agender':          { label: 'Agénero',         color: 'var(--c-agender)' },
-  'fluid':            { label: 'Género fluido',   color: 'var(--c-fluid)' },
-  'queer':            { label: 'Queer',           color: 'var(--c-queer)' },
-  'other':            { label: 'Otro',            color: 'var(--c-other)' },
-  'group':            { label: 'Grupo/Banda',     color: 'var(--c-group)' },
-  'unknown':          { label: 'Sin datos',       color: 'var(--c-unknown)' },
+  'female':      { label:'Mujer',          color:'var(--c-female)' },
+  'male':        { label:'Hombre',         color:'var(--c-male)' },
+  'non-binary':  { label:'No binario',     color:'var(--c-nb)' },
+  'trans-woman': { label:'Mujer trans',    color:'var(--c-trans-woman)' },
+  'trans-man':   { label:'Hombre trans',   color:'var(--c-trans-man)' },
+  'intersex':    { label:'Intersex',       color:'var(--c-intersex)' },
+  'agender':     { label:'Agénero',        color:'var(--c-agender)' },
+  'fluid':       { label:'Género fluido',  color:'var(--c-fluid)' },
+  'queer':       { label:'Queer',          color:'var(--c-queer)' },
+  'other':       { label:'Otro',           color:'var(--c-other)' },
+  'group':       { label:'Grupo/Banda',    color:'var(--c-group)' },
+  'unknown':     { label:'Sin datos',      color:'var(--c-unknown)' },
 };
-
 const COMPOSITION_CFG = {
-  'majority-female': { label: 'May. mujeres',   color: 'var(--c-female)' },
-  'majority-male':   { label: 'May. hombres',   color: 'var(--c-male)' },
-  'mixed':           { label: 'Mixto',           color: 'var(--c-group)' },
-  'majority-nb':     { label: 'May. NB/Queer',  color: 'var(--c-nb)' },
-  'unknown':         { label: 'Comp. desconocida', color: 'var(--c-unknown)' },
+  'majority-female': { label:'May. mujeres',    color:'var(--c-female)' },
+  'majority-male':   { label:'May. hombres',    color:'var(--c-male)' },
+  'mixed':           { label:'Mixto',            color:'var(--c-group)' },
+  'majority-nb':     { label:'May. NB/Queer',   color:'var(--c-nb)' },
+  'unknown':         { label:'Comp. desconocida', color:'var(--c-unknown)' },
 };
-
 const GENDER_ORDER = ['female','male','non-binary','trans-woman','trans-man','intersex','agender','fluid','queer','other','group','unknown'];
 const MB_GENDER    = { 'Male':'male','Female':'female','Non-binary':'non-binary','Other':'other' };
 
@@ -441,8 +509,8 @@ let currentTab     = 'liked';
 let likedPeriod    = 'all';
 let topRange       = 'short_term';
 let currentResults = [];
-let chartView      = 'separate'; // 'separate' | 'combined'
-let editQueue      = [];   // indices de artistas sin datos
+let chartView      = 'separate';
+let editQueue      = [];
 let editQueuePos   = 0;
 const mbCache      = new Map();
 const atCache      = new Map();
@@ -456,26 +524,106 @@ window.addEventListener('load', async () => {
   el('redirectDisplay').textContent = REDIRECT_URI;
   const saved = localStorage.getItem('gsp_cid');
   if (saved) el('clientInput').value = saved;
+
+  // Mostrar banner si hay cache
+  checkCachedResults();
+
   const code = new URLSearchParams(location.search).get('code');
   if (code) await handleCallback(code);
+
   loadAtCache();
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AIRTABLE HELPERS
+// LOCALSTORAGE — persistencia de resultados
+// ─────────────────────────────────────────────────────────────────────────────
+function saveResultsToCache(results, tab, period, range) {
+  try {
+    const payload = {
+      results,
+      tab, period, range,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(payload));
+  } catch(e) {}
+}
+
+function checkCachedResults() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return;
+    const payload = JSON.parse(raw);
+    if (!payload.results?.length) return;
+
+    const date    = new Date(payload.timestamp);
+    const diffMs  = Date.now() - payload.timestamp;
+    const diffDays= Math.floor(diffMs / 86400000);
+    const diffHrs = Math.floor(diffMs / 3600000);
+
+    let ago;
+    if (diffDays > 0) ago = `hace ${diffDays} día${diffDays!==1?'s':''}`;
+    else if (diffHrs > 0) ago = `hace ${diffHrs} hora${diffHrs!==1?'s':''}`;
+    else ago = 'hace menos de una hora';
+
+    const label = payload.tab === 'liked'
+      ? `Me gusta · ${{'all':'Desde siempre','1y':'Último año','3y':'Últimos 3 años','5y':'Últimos 5 años'}[payload.period]}`
+      : `Top artistas · ${{'short_term':'Último mes','medium_term':'6 meses','long_term':'Todo el tiempo'}[payload.range]}`;
+
+    el('cachedLabel').textContent = label + ` — ${payload.results.length} artistas`;
+    el('cachedDate').textContent  = `Guardado ${ago} · ${date.toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' })}`;
+    el('cachedBanner').classList.add('on');
+  } catch(e) {}
+}
+
+function loadCached() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return;
+    const payload = JSON.parse(raw);
+    currentResults = payload.results;
+    currentTab     = payload.tab;
+    likedPeriod    = payload.period;
+    topRange       = payload.range;
+
+    // Sync UI tabs/filters
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el('tab-'+currentTab).classList.add('active');
+    el('likedFilters').classList.toggle('on', currentTab==='liked');
+    el('topFilters').classList.toggle('on', currentTab==='top');
+
+    el('cachedBanner').classList.remove('on');
+    renderResults(currentResults);
+  } catch(e) { showError('No se pudo restaurar el análisis guardado.'); }
+}
+
+function clearCached() {
+  localStorage.removeItem(LS_KEY);
+  el('cachedBanner').classList.remove('on');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AIRTABLE
 // ─────────────────────────────────────────────────────────────────────────────
 async function loadAtCache() {
   try {
     let offset = null;
     do {
       const url = new URL(AT_URL);
-      url.searchParams.set('pageSize', '100');
+      url.searchParams.set('pageSize','100');
       if (offset) url.searchParams.set('offset', offset);
       const r    = await fetch(url, { headers: AT_HEADERS });
+      if (!r.ok) break;
       const data = await r.json();
-      for (const rec of (data.records || [])) {
+      for (const rec of (data.records||[])) {
         const key = rec.fields.name?.toLowerCase().trim();
-        if (key) atCache.set(key, { gender: rec.fields.gender, type: rec.fields.type, composition: rec.fields.composition, source: 'community', verified: rec.fields.verified, recordId: rec.id });
+        if (key) atCache.set(key, {
+          gender:      rec.fields.gender,
+          type:        rec.fields.type,
+          composition: rec.fields.composition,
+          source:      'community',
+          verified:    rec.fields.verified,
+          recordId:    rec.id,
+        });
       }
       offset = data.offset;
     } while (offset);
@@ -485,32 +633,32 @@ async function loadAtCache() {
 async function saveToAirtable(name, type, gender, composition) {
   const key      = name.toLowerCase().trim();
   const existing = atCache.get(key);
-  const fields   = { name, type, gender, composition: composition || '', verified: true, added_at: new Date().toISOString().split('T')[0], source: 'manual' };
+  const fields   = { name, type, gender, composition: composition||'', verified: true, added_at: new Date().toISOString().split('T')[0], source:'manual' };
   try {
     let recordId;
     if (existing?.recordId) {
-      await fetch(`${AT_URL}/${existing.recordId}`, { method: 'PATCH', headers: AT_HEADERS, body: JSON.stringify({ fields }) });
+      await fetch(`${AT_URL}/${existing.recordId}`, { method:'PATCH', headers:AT_HEADERS, body:JSON.stringify({ fields }) });
       recordId = existing.recordId;
     } else {
-      const r    = await fetch(AT_URL, { method: 'POST', headers: AT_HEADERS, body: JSON.stringify({ fields }) });
+      const r    = await fetch(AT_URL, { method:'POST', headers:AT_HEADERS, body:JSON.stringify({ fields }) });
       const data = await r.json();
       recordId   = data.id;
     }
-    atCache.set(key, { ...fields, source: 'community', verified: true, recordId });
+    atCache.set(key, { ...fields, source:'community', verified:true, recordId });
     return true;
   } catch(e) { return false; }
 }
 
 async function deleteFromAirtable(recordId, name) {
   try {
-    await fetch(`${AT_URL}/${recordId}`, { method: 'DELETE', headers: AT_HEADERS });
+    await fetch(`${AT_URL}/${recordId}`, { method:'DELETE', headers:AT_HEADERS });
     atCache.delete(name.toLowerCase().trim());
     return true;
   } catch(e) { return false; }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PKCE AUTH
+// AUTH PKCE
 // ─────────────────────────────────────────────────────────────────────────────
 function randomString(len) {
   const arr = new Uint8Array(len);
@@ -536,7 +684,7 @@ async function handleCallback(code) {
   try {
     const r    = await fetch('https://accounts.spotify.com/api/token', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body });
     const data = await r.json();
-    if (!r.ok || !data.access_token) { showError('Error Spotify: ' + (data.error_description || data.error)); return; }
+    if (!r.ok || !data.access_token) { showError('Error Spotify: ' + (data.error_description||data.error)); return; }
     token = data.access_token;
     history.replaceState({}, document.title, location.pathname);
     await onLoggedIn();
@@ -550,6 +698,7 @@ function logout() {
   el('analyzeBtn').classList.remove('on');
   el('configPanel').style.display = 'block';
   el('adminPanel').classList.remove('on');
+  checkCachedResults();
 }
 async function onLoggedIn() {
   el('configPanel').style.display = 'none';
@@ -566,7 +715,7 @@ async function onLoggedIn() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SPOTIFY
+// SPOTIFY API
 // ─────────────────────────────────────────────────────────────────────────────
 async function spotifyFetch(path, params = {}) {
   const url = new URL('https://api.spotify.com/v1' + path);
@@ -612,15 +761,18 @@ async function analyze() {
   hideError();
   el('resultsEl').classList.remove('on');
   el('legendEl').classList.remove('on');
+  el('cachedBanner').classList.remove('on');
   setProgress(0);
   el('loadingNote').textContent = '';
   showLoading('Obteniendo artistas...');
   try {
-    const artists = currentTab === 'liked' ? await getLikedArtists() : await getTopArtists();
+    const artists = currentTab==='liked' ? await getLikedArtists() : await getTopArtists();
     if (!artists.length) { hideLoading(); showError('No se encontraron artistas.'); return; }
     await enrichImages(artists);
     el('loadingNote').textContent = 'MusicBrainz → TheAudioDB → base colaborativa...';
     currentResults = await classifyAll(artists);
+    // Guardar en localStorage
+    saveResultsToCache(currentResults, currentTab, likedPeriod, topRange);
     hideLoading();
     renderResults(currentResults);
   } catch(e) {
@@ -658,14 +810,14 @@ async function getLikedArtists() {
 async function getTopArtists() {
   setLoadingText('Cargando top artistas...');
   const data = await spotifyFetch('/me/top/artists', { time_range:topRange, limit:50 });
-  return (data.items||[]).map(a => ({ id:a.id, name:a.name, image:a.images.length ? a.images[a.images.length-1].url : null }));
+  return (data.items||[]).map(a => ({ id:a.id, name:a.name, image: a.images.length ? a.images[a.images.length-1].url : null }));
 }
 
 async function enrichImages(artists) {
   const noImg = artists.filter(a => !a.image && a.id);
   for (let i = 0; i < noImg.length; i += 50) {
     try {
-      const ids  = noImg.slice(i,i+50).map(a=>a.id).join(',');
+      const ids = noImg.slice(i,i+50).map(a=>a.id).join(',');
       const data = await spotifyFetch('/artists', { ids });
       for (const ar of data.artists) {
         const found = artists.find(a => a.id===ar.id);
@@ -676,11 +828,10 @@ async function enrichImages(artists) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MUSICBRAINZ — 3 en paralelo, sigue a TheAudioDB si no hay género
+// MUSICBRAINZ
 // ─────────────────────────────────────────────────────────────────────────────
-const MB_BASE   = 'https://musicbrainz.org/ws/2';
-const GROUP_TYPES_MB = ['Group','Orchestra','Choir','Character'];
-
+const MB_BASE        = 'https://musicbrainz.org/ws/2';
+const GROUP_TYPES_MB = new Set(['Group','Orchestra','Choir','Character']);
 function sleep(ms) { return new Promise(r => setTimeout(r,ms)); }
 
 async function mbLookup(name) {
@@ -693,19 +844,14 @@ async function mbLookup(name) {
     const data = await r.json();
     const hit  = data.artists?.[0];
     if (!hit)  { mbCache.set(key,null); return null; }
-
-    // Siempre reportar si encontró el artista, aunque no tenga género
-    const isGroup  = GROUP_TYPES_MB.includes(hit.type);
-    const hasGender = !!hit.gender;
-
+    const isGroup = GROUP_TYPES_MB.has(hit.type);
     let result;
     if (isGroup) {
       result = { found:true, gender:'group', type:'group', source:'MusicBrainz', hasData:true };
-    } else if (hasGender) {
-      result = { found:true, gender: MB_GENDER[hit.gender]||'other', type:'solo', source:'MusicBrainz', hasData:true };
+    } else if (hit.gender) {
+      result = { found:true, gender:MB_GENDER[hit.gender]||'other', type:'solo', source:'MusicBrainz', hasData:true };
     } else {
-      // Encontrado pero sin género — reportar found:true, hasData:false para que siga a TheAudioDB
-      result = { found:true, gender:null, type: isGroup?'group':'solo', source:'MusicBrainz', hasData:false };
+      result = { found:true, gender:null, type:'solo', source:'MusicBrainz', hasData:false };
     }
     mbCache.set(key, result);
     return result;
@@ -716,7 +862,6 @@ async function mbLookup(name) {
 // THEAUDIODB
 // ─────────────────────────────────────────────────────────────────────────────
 const TADB_BASE = 'https://www.theaudiodb.com/api/v1/json/2';
-
 async function tadbLookup(name) {
   try {
     const r    = await fetch(`${TADB_BASE}/search.php?s=${encodeURIComponent(name)}`);
@@ -726,40 +871,25 @@ async function tadbLookup(name) {
     if (!a) return null;
     const gMap = { 'male':'male','female':'female','group':'group','mixed group':'group','band':'group' };
     const g    = gMap[a.strGender?.toLowerCase()];
-    if (!g) return null;
-    const type = ['group','mixed group','band'].includes(a.strGender?.toLowerCase()) ? 'group' : 'solo';
-    return { found:true, gender:g, type, source:'TheAudioDB', hasData:true };
+    if (!g) return { found:true, gender:null, type: a.strMusicBrainzID ? 'solo' : 'solo', source:'TheAudioDB', hasData:false };
+    const isGroup = ['group','mixed group','band'].includes(a.strGender?.toLowerCase());
+    return { found:true, gender:g, type:isGroup?'group':'solo', source:'TheAudioDB', hasData:true };
   } catch(e) { return null; }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CLASSIFY ALL
-// Pipeline: Airtable → MusicBrainz → TheAudioDB (si MB no tiene género) → nombre
 // ─────────────────────────────────────────────────────────────────────────────
 async function classifyAll(artists) {
   const total   = artists.length;
-  const results = artists.map(a => ({
-    ...a,
-    gender:      'unknown',
-    type:        'solo',
-    composition: 'unknown',
-    source:      'none',
-    mbFound:     false,   // MusicBrainz encontró el artista?
-    mbHasData:   false,   // MusicBrainz tenía género?
-    tadbFound:   false,   // TheAudioDB encontró el artista?
-    tadbHasData: false,   // TheAudioDB tenía género?
-  }));
+  const results = artists.map(a => ({ ...a, gender:'unknown', type:'solo', composition:'unknown', source:'none', mbFound:false, mbHasData:false, tadbFound:false, tadbHasData:false }));
 
   // PASO 1 — Airtable
   for (const a of results) {
     const hit = atCache.get(a.name.toLowerCase().trim());
-    if (hit) {
-      a.gender = hit.gender; a.type = hit.type||'solo';
-      a.composition = hit.composition||'unknown';
-      a.source = 'community'; a.verified = true;
-    }
+    if (hit) { a.gender=hit.gender; a.type=hit.type||'solo'; a.composition=hit.composition||'unknown'; a.source='community'; a.verified=true; }
   }
-  const needClass = results.filter(a => a.source === 'none');
+  const needClass = results.filter(a => a.source==='none');
   setProgress(15);
 
   // PASO 2 — MusicBrainz (3 en paralelo)
@@ -768,46 +898,34 @@ async function classifyAll(artists) {
     const batch = needClass.slice(i, i+PARALLEL);
     setLoadingText(`MusicBrainz: ${Math.min(i+PARALLEL, needClass.length)}/${needClass.length}`);
     await Promise.all(batch.map(async a => {
-      const hit = await mbLookup(a.name);
+      const hit   = await mbLookup(a.name);
       a.mbFound   = !!hit?.found;
       a.mbHasData = !!hit?.hasData;
-      if (hit?.hasData) {
-        a.gender = hit.gender; a.type = hit.type; a.source = 'MusicBrainz';
-      }
+      if (hit?.hasData) { a.gender=hit.gender; a.type=hit.type; a.source='MusicBrainz'; }
     }));
     setProgress(15 + (i/needClass.length)*35);
     await sleep(400);
   }
 
-  // PASO 3 — TheAudioDB para los que MB encontró pero sin género, o no encontró
-  const needTADB = results.filter(a => a.source === 'none');
+  // PASO 3 — TheAudioDB para los que siguen sin datos
+  const needTADB = results.filter(a => a.source==='none');
   for (let i = 0; i < needTADB.length; i++) {
     const a = needTADB[i];
     setLoadingText(`TheAudioDB: ${a.name} (${i+1}/${needTADB.length})`);
     setProgress(50 + (i/Math.max(needTADB.length,1))*30);
-    const hit   = await tadbLookup(a.name);
+    const hit     = await tadbLookup(a.name);
     a.tadbFound   = !!hit?.found;
     a.tadbHasData = !!hit?.hasData;
-    if (hit?.hasData) {
-      a.gender = hit.gender; a.type = hit.type; a.source = 'TheAudioDB';
-    }
+    if (hit?.hasData) { a.gender=hit.gender; a.type=hit.type; a.source='TheAudioDB'; }
     await sleep(150);
   }
 
   // PASO 4 — Fallback nombre
   for (const a of results) {
-    if (a.source === 'none') {
+    if (a.source==='none') {
       const g = inferByName(a.name);
-      if (g === 'group') { a.gender='group'; a.type='group'; a.source='nombre'; }
-      else if (g !== 'unknown') { a.gender=g; a.type='solo'; a.source='nombre'; }
-    }
-  }
-
-  // Para grupos sin composición, poner composition unknown
-  for (const a of results) {
-    if (a.type === 'group' && (!a.composition || a.composition === 'unknown')) {
-      a.composition = 'unknown';
-      if (a.gender === 'group') a.gender = 'group'; // mantener
+      if (g==='group')        { a.gender='group'; a.type='group'; a.source='nombre'; }
+      else if (g!=='unknown') { a.gender=g; a.type='solo'; a.source='nombre'; }
     }
   }
 
@@ -819,12 +937,12 @@ async function classifyAll(artists) {
 // FALLBACK NOMBRE
 // ─────────────────────────────────────────────────────────────────────────────
 const FEMALE_NAMES = new Set(['taylor','adele','beyoncé','beyonce','rihanna','billie','ariana','selena','dua','olivia','miley','camila','demi','nicki','cardi','lizzo','sia','lorde','lana','halsey','kesha','katy','bebe','ava','clairo','sza','tinashe','ella','jessie','charli','amy','alicia','nina','diana','sarah','jennifer','jessica','emily','grace','aurora','paloma','rosalía','rosalia','ana','maria','paula','valentina','sofia','claudia','laura','marta','elena','sara','alba','carmen','lucía','lucia','pilar','teresa','rosa','patricia','natalia','andrea','mónica','monica','susana','cristina','sandra','eva','virginia','irene','beatriz','noa','amaia','ruth','leire','aitana','malú','malu','india','vanessa','shakira','grimes','lykke','feist','björk','bjork','imogen','fka','solange','kelela','sevdaliza','mitski','weyes','phoebe','caroline','yeule','oklou','shygirl','arca','sophie','angèle','angele','pomme','clara','camille','hoshi','jain','aya','yseult','lous','fatoumata','erykah','lauryn','jill','jazmine','ledisi','ciara','ashanti','brandy','monica','kacey','maren','miranda','carrie','dolly','emmylou','loretta','tammy','shania','faith','martina','trisha','wynonna','reba','norah','joni','sheryl','alanis','fiona','tori','enya','sinead','natalie','jewel','melissa','avril','pink','gwen','hayley','kelly','christina','mandy','hilary','britney','janet','gloria','cyndi','donna','cher','aretha','tina','janis','patti','bonnie','linda','karen','debbie','alice','kate','emma','julia','anna','lisa','mary','helen','elizabeth','claire','rachel','rebecca','hannah','sophia','barbara','susan','dorothy','betty','sharon','heather','amber','megan','tiffany','lauren','samantha','ashley','stephanie','nicole','victoria','anne','doja','mahalia','jorja','birdy']);
-const MALE_NAMES = new Set(['ed','drake','eminem','kanye','jay','kendrick','travis','post','lil','juice','tyler','frank','childish','chance','mac','asap','tupac','nas','snoop','ice','dre','rakim','common','mos','talib','andre','ludacris','nelly','usher','trey','chris','miguel','sam','shawn','charlie','harry','niall','louis','zayn','liam','john','paul','george','ringo','mick','keith','david','bruce','prince','michael','bob','james','ray','elvis','chuck','jerry','freddie','roger','pete','dave','jimmy','jimi','eric','tom','don','neil','elton','billy','barry','randy','warren','peter','simon','ryan','adam','luke','alan','mark','matt','nick','ian','noel','damon','thom','morrissey','robert','bono','sting','phil','ozzy','tony','lemmy','slash','axl','duff','steven','bobby','tommy','joey','dee','marky','johnny','sid','joe','pablo','juan','carlos','jose','antonio','francisco','manuel','jorge','alejandro','pedro','rafael','sergio','mario','fernando','roberto','enrique','raúl','raul','marc','joan','jordi','pau','gerard','abel','wos','bizarrap','duki','lit','trueno','rusherking','moby','skrillex','diplo','flume','kaytranada','aphex','burial','squarepusher','tricky','sufjan','bon','iron','jon','mura','sohn','tame','kevin','colin','ben','alex','daniel','julian','albert','nikolai','fabrizio','cal','jack','brendon','mikey','patrick','andy','rob','remi','wolf','omar','syd','steve']);
+const MALE_NAMES   = new Set(['ed','drake','eminem','kanye','jay','kendrick','travis','post','lil','juice','tyler','frank','childish','chance','mac','asap','tupac','nas','snoop','ice','dre','rakim','common','mos','talib','andre','ludacris','nelly','usher','trey','chris','miguel','sam','shawn','charlie','harry','niall','louis','zayn','liam','john','paul','george','ringo','mick','keith','david','bruce','prince','michael','bob','james','ray','elvis','chuck','jerry','freddie','roger','pete','dave','jimmy','jimi','eric','tom','don','neil','elton','billy','barry','randy','warren','peter','simon','ryan','adam','luke','alan','mark','matt','nick','ian','noel','damon','thom','morrissey','robert','bono','sting','phil','ozzy','tony','lemmy','slash','axl','duff','steven','bobby','tommy','joey','dee','marky','johnny','sid','joe','pablo','juan','carlos','jose','antonio','francisco','manuel','jorge','alejandro','pedro','rafael','sergio','mario','fernando','roberto','enrique','raúl','raul','marc','joan','jordi','pau','gerard','abel','wos','bizarrap','duki','lit','trueno','rusherking','moby','skrillex','diplo','flume','kaytranada','aphex','burial','squarepusher','tricky','sufjan','bon','iron','jon','mura','sohn','tame','kevin','colin','ben','alex','daniel','julian','albert','nikolai','fabrizio','cal','jack','brendon','mikey','patrick','andy','rob','remi','wolf','omar','syd','steve']);
 
 function inferByName(name) {
   const lower = name.toLowerCase().trim();
-  const groupIndicators = [' & ',' and ',' y ',' feat ',' vs ',' x ','/','trio','quartet','orchestra','ensemble','choir','band','brothers','sisters','boys','girls','crew','collective','experience','sound','machine'];
-  for (const ind of groupIndicators) { if (lower.includes(ind)) return 'group'; }
+  const grp   = [' & ',' and ',' y ',' feat ',' vs ',' x ','/','trio','quartet','orchestra','ensemble','choir','band','brothers','sisters','boys','girls','crew','collective','experience','sound','machine'];
+  for (const g of grp) { if (lower.includes(g)) return 'group'; }
   const tokens = lower.split(/[\s\-_\.]+/);
   for (const t of [tokens[0],...tokens]) {
     if (FEMALE_NAMES.has(t)) return 'female';
@@ -837,242 +955,208 @@ function inferByName(name) {
 // RENDER
 // ─────────────────────────────────────────────────────────────────────────────
 function renderResults(classified) {
+  renderContext(classified);
   renderCharts(classified);
   renderArtistList(classified);
   el('legendEl').classList.add('on');
   el('resultsEl').classList.add('on');
 }
 
-function renderCharts(classified) {
-  const total = classified.length;
+function renderContext(classified) {
+  // Calcular % femenino (solo solistas femeninas / total no-grupo)
+  const soloists  = classified.filter(a => a.type !== 'group');
+  const females   = classified.filter(a => a.gender === 'female');
+  const myPct     = soloists.length ? Math.round(females.length / classified.length * 100) : 0;
 
-  if (chartView === 'separate') {
-    renderSeparateCharts(classified, total);
-  } else {
-    renderCombinedCharts(classified, total);
-  }
+  const GLOBAL_AVG   = 23;
+  const FEMALE_AVG   = 32;
+  const MALE_AVG     = 19;
+
+  const rows = el('contextRows');
+  rows.innerHTML = '';
+
+  const data = [
+    { label: 'Tu escucha',              pct: myPct,      color: 'var(--c-female)', bold: true },
+    { label: 'Promedio global Spotify', pct: GLOBAL_AVG, color: 'var(--muted)',    bold: false },
+    { label: 'Promedio oyentes mujeres',pct: FEMALE_AVG, color: 'var(--muted)',    bold: false },
+    { label: 'Promedio oyentes hombres',pct: MALE_AVG,   color: 'var(--muted)',    bold: false },
+  ];
+
+  data.forEach(d => {
+    const row = document.createElement('div');
+    row.className = 'context-row';
+    row.innerHTML = `
+      <span class="context-label" style="${d.bold?'color:var(--text)':''}">${d.label}</span>
+      <div class="context-bar-track">
+        <div class="context-bar-fill ctx-bar" style="background:${d.color};width:0%" data-pct="${d.pct}"></div>
+      </div>
+      <span class="context-pct" style="color:${d.color}">${d.pct}%</span>`;
+    rows.appendChild(row);
+  });
+
+  setTimeout(() => {
+    document.querySelectorAll('.ctx-bar').forEach(b => {
+      b.style.width = b.dataset.pct + '%';
+    });
+  }, 100);
 }
 
-function renderSeparateCharts(classified, total) {
-  // Separado: solistas por género + grupos por composición
-  const soloists  = classified.filter(a => a.type !== 'group');
-  const groups    = classified.filter(a => a.type === 'group');
+function renderCharts(classified) {
+  if (chartView === 'separate') renderSeparateCharts(classified);
+  else renderCombinedCharts(classified);
+}
 
+function renderSeparateCharts(classified) {
+  const soloists = classified.filter(a => a.type !== 'group');
+  const groups   = classified.filter(a => a.type === 'group');
   const soloCounts = {};
   GENDER_ORDER.filter(g => g !== 'group').forEach(g => soloCounts[g] = 0);
   soloists.forEach(a => soloCounts[a.gender] = (soloCounts[a.gender]||0) + 1);
-
   const compCounts = {};
   Object.keys(COMPOSITION_CFG).forEach(c => compCounts[c] = 0);
   groups.forEach(a => compCounts[a.composition||'unknown'] = (compCounts[a.composition||'unknown']||0) + 1);
 
-  const grid = el('numbersGrid');
-  grid.innerHTML = '';
-
-  // Solistas
+  const grid = el('numbersGrid'); grid.innerHTML = '';
   GENDER_ORDER.filter(g => g!=='group' && soloCounts[g]>0).forEach(g => {
-    const { label,color } = GENDER_CFG[g];
     const pct = Math.round(soloCounts[g]/Math.max(soloists.length,1)*100);
-    addNumCell(grid, pct+'%', label, soloCounts[g]+' solista'+(soloCounts[g]!==1?'s':''), color);
+    addNumCell(grid, pct+'%', GENDER_CFG[g].label, soloCounts[g]+' solista'+(soloCounts[g]!==1?'s':''), GENDER_CFG[g].color);
   });
-  // Grupos
   if (groups.length) {
     Object.entries(compCounts).filter(([,c])=>c>0).forEach(([comp,count]) => {
-      const { label,color } = COMPOSITION_CFG[comp];
       const pct = Math.round(count/groups.length*100);
-      addNumCell(grid, pct+'%', label, count+' grupo'+(count!==1?'s':''), color);
+      addNumCell(grid, pct+'%', COMPOSITION_CFG[comp].label, count+' grupo'+(count!==1?'s':''), COMPOSITION_CFG[comp].color);
     });
   }
 
-  const bars = el('barsContainer');
-  bars.innerHTML = '';
-
+  const bars = el('barsContainer'); bars.innerHTML = '';
   if (soloists.length) {
-    const t = document.createElement('div');
-    t.className = 'bar-section-title';
-    t.textContent = `Solistas (${soloists.length})`;
-    bars.appendChild(t);
+    addBarSectionTitle(bars, `Solistas (${soloists.length})`);
     GENDER_ORDER.filter(g => g!=='group' && soloCounts[g]>0).forEach(g => {
-      const { label,color } = GENDER_CFG[g];
-      addBarRow(bars, label, Math.round(soloCounts[g]/soloists.length*100), color, 'bs-'+g);
+      addBarRow(bars, GENDER_CFG[g].label, Math.round(soloCounts[g]/soloists.length*100), GENDER_CFG[g].color, 'bs-'+g);
     });
   }
-
   if (groups.length) {
-    const div = document.createElement('div');
-    div.className = 'bars-divider';
-    bars.appendChild(div);
-    const t = document.createElement('div');
-    t.className = 'bar-section-title';
-    t.textContent = `Grupos / Bandas (${groups.length})`;
-    bars.appendChild(t);
+    const div = document.createElement('div'); div.className='bars-divider'; bars.appendChild(div);
+    addBarSectionTitle(bars, `Grupos / Bandas (${groups.length})`);
     Object.entries(compCounts).filter(([,c])=>c>0).forEach(([comp,count]) => {
-      const { label,color } = COMPOSITION_CFG[comp];
-      addBarRow(bars, label, Math.round(count/groups.length*100), color, 'bc-'+comp);
+      addBarRow(bars, COMPOSITION_CFG[comp].label, Math.round(count/groups.length*100), COMPOSITION_CFG[comp].color, 'bc-'+comp);
     });
   }
 
-  setTimeout(() => animateBars(soloists, groups, soloCounts, compCounts), 80);
+  setTimeout(() => {
+    GENDER_ORDER.forEach(g => { const b=document.getElementById('bs-'+g); if(b) b.style.width=Math.round((soloCounts[g]||0)/Math.max(soloists.length,1)*100)+'%'; });
+    Object.keys(COMPOSITION_CFG).forEach(c => { const b=document.getElementById('bc-'+c); if(b) b.style.width=Math.round((compCounts[c]||0)/Math.max(groups.length,1)*100)+'%'; });
+  }, 80);
 }
 
-function animateBars(soloists, groups, soloCounts, compCounts) {
-  GENDER_ORDER.forEach(g => {
-    const b = document.getElementById('bs-'+g);
-    if (b) b.style.width = Math.round((soloCounts[g]||0)/Math.max(soloists.length,1)*100)+'%';
-  });
-  Object.keys(COMPOSITION_CFG).forEach(c => {
-    const b = document.getElementById('bc-'+c);
-    if (b) b.style.width = Math.round((compCounts[c]||0)/Math.max(groups.length,1)*100)+'%';
-  });
-}
-
-function renderCombinedCharts(classified, total) {
-  // Combinado: grupos suman según composición al género correspondiente
+function renderCombinedCharts(classified) {
+  const total = classified.length;
   const counts = {};
   GENDER_ORDER.forEach(g => counts[g] = 0);
-
-  for (const a of classified) {
-    if (a.type !== 'group') {
-      counts[a.gender] = (counts[a.gender]||0) + 1;
-    } else {
-      // Mapear composición a género
-      const compToGender = { 'majority-female':'female','majority-male':'male','mixed':'group','majority-nb':'non-binary','unknown':'unknown' };
-      const g = compToGender[a.composition||'unknown'] || 'group';
-      counts[g] = (counts[g]||0) + 1;
-    }
-  }
-
-  const grid = el('numbersGrid');
-  grid.innerHTML = '';
-  GENDER_ORDER.filter(g => counts[g]>0).forEach(g => {
-    const { label,color } = GENDER_CFG[g];
-    const pct = Math.round(counts[g]/total*100);
-    addNumCell(grid, pct+'%', label, counts[g]+' artista'+(counts[g]!==1?'s':''), color);
+  const compMap = { 'majority-female':'female','majority-male':'male','mixed':'group','majority-nb':'non-binary','unknown':'unknown' };
+  classified.forEach(a => {
+    const g = a.type==='group' ? (compMap[a.composition||'unknown']||'group') : a.gender;
+    counts[g] = (counts[g]||0) + 1;
   });
 
-  const bars = el('barsContainer');
-  bars.innerHTML = '';
+  const grid = el('numbersGrid'); grid.innerHTML = '';
   GENDER_ORDER.filter(g => counts[g]>0).forEach(g => {
-    const { label,color } = GENDER_CFG[g];
-    addBarRow(bars, label, Math.round(counts[g]/total*100), color, 'bc2-'+g);
+    const pct = Math.round(counts[g]/total*100);
+    addNumCell(grid, pct+'%', GENDER_CFG[g].label, counts[g]+' artista'+(counts[g]!==1?'s':''), GENDER_CFG[g].color);
+  });
+
+  const bars = el('barsContainer'); bars.innerHTML = '';
+  GENDER_ORDER.filter(g => counts[g]>0).forEach(g => {
+    addBarRow(bars, GENDER_CFG[g].label, Math.round(counts[g]/total*100), GENDER_CFG[g].color, 'bc2-'+g);
   });
   setTimeout(() => {
-    GENDER_ORDER.forEach(g => {
-      const b = document.getElementById('bc2-'+g);
-      if (b) b.style.width = Math.round((counts[g]||0)/total*100)+'%';
-    });
+    GENDER_ORDER.forEach(g => { const b=document.getElementById('bc2-'+g); if(b) b.style.width=Math.round((counts[g]||0)/total*100)+'%'; });
   }, 80);
 }
 
 function addNumCell(parent, big, label, count, color) {
-  const cell = document.createElement('div');
-  cell.className = 'num-cell';
-  cell.innerHTML = `<div class="num-big" style="color:${color}">${big}</div><div class="num-label">${label}</div><div class="num-count">${count}</div>`;
-  parent.appendChild(cell);
+  const c = document.createElement('div'); c.className='num-cell';
+  c.innerHTML=`<div class="num-big" style="color:${color}">${big}</div><div class="num-label">${label}</div><div class="num-count">${count}</div>`;
+  parent.appendChild(c);
 }
-
+function addBarSectionTitle(parent, text) {
+  const t = document.createElement('div'); t.className='bar-section-title'; t.textContent=text; parent.appendChild(t);
+}
 function addBarRow(parent, label, pct, color, id) {
-  const row = document.createElement('div');
-  row.className = 'bar-row';
-  row.innerHTML = `<span class="bar-label">${label}</span><div class="bar-track"><div class="bar-fill" id="${id}" style="background:${color}"></div></div><span class="bar-pct" style="color:${color}">${pct}%</span>`;
-  parent.appendChild(row);
+  const r = document.createElement('div'); r.className='bar-row';
+  r.innerHTML=`<span class="bar-label">${label}</span><div class="bar-track"><div class="bar-fill" id="${id}" style="background:${color}"></div></div><span class="bar-pct" style="color:${color}">${pct}%</span>`;
+  parent.appendChild(r);
 }
 
 function renderArtistList(classified) {
-  const list = el('artistList');
-  list.innerHTML = '';
+  const list = el('artistList'); list.innerHTML = '';
   el('artistsTitle').textContent = currentTab==='liked' ? `${classified.length} artistas únicos en me gusta` : `Top ${classified.length} artistas`;
 
   classified.forEach((a, idx) => {
     const gCfg    = GENDER_CFG[a.gender]    || GENDER_CFG.unknown;
     const compCfg = COMPOSITION_CFG[a.composition] || COMPOSITION_CFG.unknown;
-    const needsEdit = a.source === 'none' || a.gender === 'unknown';
+    const needsEdit = a.gender==='unknown' || a.source==='none';
+    const typeLabel = a.type==='group' ? 'Grupo/Banda' : 'Solista';
+    const borderColor = needsEdit ? 'var(--muted)' : (a.type==='group' ? compCfg.color : gCfg.color);
+
+    let tagsHtml = `<div class="tags"><span class="tag type">${typeLabel}</span>`;
+    if (a.type==='group') tagsHtml += `<span class="tag" style="color:${compCfg.color};border-color:${compCfg.color}">${compCfg.label}</span>`;
+    else tagsHtml += `<span class="tag" style="color:${gCfg.color};border-color:${gCfg.color}">${gCfg.label}</span>`;
+    tagsHtml += `</div>`;
+
+    let srcHtml = `<div class="sources">`;
+    if (a.source==='community') srcHtml += `<span class="src-pill community">✓ comunidad</span>`;
+    else if (a.source==='nombre') srcHtml += `<span class="src-pill inferred">★ nombre</span>`;
+    else {
+      const mbShow   = a.mbFound   || a.source==='MusicBrainz';
+      const tadbShow = a.tadbFound || a.source==='TheAudioDB';
+      if (mbShow)   srcHtml += `<span class="src-pill ${a.source==='MusicBrainz'?'hit':''}">MB</span>`;
+      if (tadbShow) srcHtml += `<span class="src-pill ${a.source==='TheAudioDB'?'hit':''}">TADB</span>`;
+      if (!mbShow && !tadbShow) srcHtml += `<span class="src-pill">—</span>`;
+    }
+    srcHtml += `</div>`;
 
     const row = document.createElement('div');
     row.className = 'artist-row' + (needsEdit?' needs-edit':'');
     row.id = 'artist-row-'+idx;
-
-    // Tipo tag siempre visible
-    const typeLabel = a.type === 'group' ? 'Grupo/Banda' : 'Solista';
-
-    // Tags
-    let tagsHtml = `<div class="tags">`;
-    tagsHtml += `<span class="tag type">${typeLabel}</span>`;
-    if (a.type === 'group') {
-      tagsHtml += `<span class="tag gender" style="color:${compCfg.color};border-color:${compCfg.color}">${compCfg.label}</span>`;
-    } else {
-      tagsHtml += `<span class="tag gender" style="color:${gCfg.color};border-color:${gCfg.color}">${gCfg.label}</span>`;
-    }
-    tagsHtml += `</div>`;
-
-    // Source pills — mostrar ambas fuentes, resaltar la que dio el dato
-    const mbClass  = a.source==='MusicBrainz' ? 'hit' : (a.mbFound ? '' : '');
-    const tadbClass= a.source==='TheAudioDB'  ? 'hit' : (a.tadbFound ? '' : '');
-    const mbShow   = a.mbFound || a.source==='MusicBrainz';
-    const tadbShow = a.tadbFound || a.source==='TheAudioDB';
-
-    let sourcesHtml = `<div class="sources">`;
-    if (a.source === 'community') {
-      sourcesHtml += `<span class="src-pill community">✓ comunidad</span>`;
-    } else if (a.source === 'nombre') {
-      sourcesHtml += `<span class="src-pill inferred">★ nombre</span>`;
-    } else {
-      if (mbShow)   sourcesHtml += `<span class="src-pill ${mbClass}">MB</span>`;
-      if (tadbShow) sourcesHtml += `<span class="src-pill ${tadbClass}">TADB</span>`;
-      if (!mbShow && !tadbShow) sourcesHtml += `<span class="src-pill">—</span>`;
-    }
-    sourcesHtml += `</div>`;
-
-    const borderColor = a.type==='group' ? compCfg.color : gCfg.color;
-
-    row.style.borderLeftColor = needsEdit ? 'var(--muted)' : borderColor;
+    row.style.borderLeftColor = borderColor;
     row.innerHTML = `
       ${a.image ? `<img class="artist-thumb" src="${a.image}" alt="" onerror="this.style.display='none'">` : `<div class="artist-thumb-empty"></div>`}
       <span class="artist-name">${esc(a.name)}</span>
-      ${sourcesHtml}
-      ${tagsHtml}
+      ${srcHtml}${tagsHtml}
       <button class="btn-edit" onclick="openEditSingle(${idx})">editar</button>`;
     list.appendChild(row);
   });
 
-  // Actualizar botón "Corregir sin datos"
   editQueue = classified.map((_,i)=>i).filter(i => classified[i].gender==='unknown' || classified[i].source==='none');
   el('editAllBtn').textContent = `Corregir sin datos (${editQueue.length}) →`;
-  el('editAllBtn').style.display = editQueue.length ? 'block' : 'none';
+  el('editAllBtn').style.display = editQueue.length ? '' : 'none';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MODAL EDICIÓN
+// MODAL
 // ─────────────────────────────────────────────────────────────────────────────
 function onTypeChange() {
   const isGroup = el('selectType').value === 'group';
   el('compositionSection').classList.toggle('on', isGroup);
-  // Si es grupo, deshabilitar select de género individual
-  el('selectGender').disabled = isGroup;
-  el('selectGender').style.opacity = isGroup ? '.4' : '1';
+  el('selectGender').disabled      = isGroup;
 }
 
-function openEdit(idx, queue, queuePos) {
+function openEdit(idx, queue, qPos) {
   const a = currentResults[idx];
   editQueue    = queue;
-  editQueuePos = queuePos;
-
-  el('modalNav').textContent = `Artista ${queuePos+1} de ${queue.length} sin datos`;
+  editQueuePos = qPos;
+  el('modalNav').textContent       = queue.length > 1 ? `Artista ${qPos+1} de ${queue.length} sin datos` : a.name;
   el('modalArtistName').textContent = a.name;
-  el('selectType').value        = a.type || 'solo';
-  el('selectGender').value      = a.gender || 'unknown';
-  el('selectComposition').value = a.composition || 'unknown';
+  el('selectType').value           = a.type||'solo';
+  el('selectGender').value         = a.gender||'unknown';
+  el('selectComposition').value    = a.composition||'unknown';
   onTypeChange();
-
-  el('btnSave').textContent = queuePos < queue.length-1 ? 'Guardar y siguiente' : 'Guardar y cerrar';
+  el('btnSave').textContent = (queue.length > 1 && qPos < queue.length-1) ? 'Guardar y siguiente' : 'Guardar';
   el('modalOverlay').classList.add('on');
 }
 
-function openEditSingle(idx) {
-  openEdit(idx, [idx], 0);
-  el('modalNav').textContent = currentResults[idx].name;
-  el('btnSave').textContent  = 'Guardar';
-}
+function openEditSingle(idx) { openEdit(idx, [idx], 0); }
 
 function startEditQueue() {
   if (!editQueue.length) return;
@@ -1081,90 +1165,57 @@ function startEditQueue() {
 }
 
 function skipEdit() {
-  const nextPos = editQueuePos + 1;
-  if (nextPos < editQueue.length) {
-    openEdit(editQueue[nextPos], editQueue, nextPos);
-  } else {
-    closeModal();
-  }
+  const next = editQueuePos + 1;
+  if (next < editQueue.length) openEdit(editQueue[next], editQueue, next);
+  else closeModal();
 }
 
 async function saveEdit() {
-  const idx = editQueue[editQueuePos];
-  const a   = currentResults[idx];
+  const idx         = editQueue[editQueuePos];
+  const a           = currentResults[idx];
   const type        = el('selectType').value;
-  const gender      = type === 'group' ? 'group' : el('selectGender').value;
-  const composition = type === 'group' ? el('selectComposition').value : '';
+  const gender      = type==='group' ? 'group' : el('selectGender').value;
+  const composition = type==='group' ? el('selectComposition').value : '';
 
-  // Actualizar en memoria sin re-renderizar toda la lista
-  a.type        = type;
-  a.gender      = gender;
-  a.composition = composition;
-  a.source      = 'community';
-  a.verified    = true;
+  a.type = type; a.gender = gender; a.composition = composition; a.source = 'community'; a.verified = true;
 
-  // Actualizar solo esa fila
   updateArtistRow(idx);
-
-  // Guardar en Airtable (async, sin bloquear)
-  saveToAirtable(a.name, type, gender, composition);
-
-  // Actualizar gráficos
   renderCharts(currentResults);
+  saveResultsToCache(currentResults, currentTab, likedPeriod, topRange);
+  saveToAirtable(a.name, type, gender, composition); // async, no bloqueante
 
-  // Avanzar en la queue
-  const nextPos = editQueuePos + 1;
-  if (nextPos < editQueue.length && editQueue.length > 1) {
-    // Remover el editado de la queue
-    editQueue.splice(editQueuePos, 1);
-    if (editQueuePos < editQueue.length) {
-      openEdit(editQueue[editQueuePos], editQueue, editQueuePos);
-    } else {
-      closeModal();
-    }
+  // Actualizar queue — remover el que acabamos de editar
+  editQueue.splice(editQueuePos, 1);
+  el('editAllBtn').textContent = `Corregir sin datos (${editQueue.length}) →`;
+  el('editAllBtn').style.display = editQueue.length ? '' : 'none';
+
+  if (editQueue.length && editQueuePos < editQueue.length) {
+    openEdit(editQueue[editQueuePos], editQueue, editQueuePos);
   } else {
-    editQueue = editQueue.filter(i => currentResults[i].gender==='unknown' || currentResults[i].source==='none');
     closeModal();
   }
 }
 
 function updateArtistRow(idx) {
-  const a    = currentResults[idx];
-  const row  = document.getElementById('artist-row-'+idx);
+  const a   = currentResults[idx];
+  const row = document.getElementById('artist-row-'+idx);
   if (!row) return;
-
   const gCfg    = GENDER_CFG[a.gender]    || GENDER_CFG.unknown;
   const compCfg = COMPOSITION_CFG[a.composition] || COMPOSITION_CFG.unknown;
   const typeLabel = a.type==='group' ? 'Grupo/Banda' : 'Solista';
-  const borderColor = a.type==='group' ? compCfg.color : gCfg.color;
-
-  row.style.borderLeftColor = borderColor;
+  row.style.borderLeftColor = a.type==='group' ? compCfg.color : gCfg.color;
   row.classList.remove('needs-edit');
-
-  // Actualizar tags
   const tagsEl = row.querySelector('.tags');
-  if (tagsEl) {
-    tagsEl.innerHTML = `
-      <span class="tag type">${typeLabel}</span>
-      ${a.type==='group'
-        ? `<span class="tag gender" style="color:${compCfg.color};border-color:${compCfg.color}">${compCfg.label}</span>`
-        : `<span class="tag gender" style="color:${gCfg.color};border-color:${gCfg.color}">${gCfg.label}</span>`}`;
-  }
-
-  // Actualizar source pill
+  if (tagsEl) tagsEl.innerHTML = `
+    <span class="tag type">${typeLabel}</span>
+    ${a.type==='group'
+      ? `<span class="tag" style="color:${compCfg.color};border-color:${compCfg.color}">${compCfg.label}</span>`
+      : `<span class="tag" style="color:${gCfg.color};border-color:${gCfg.color}">${gCfg.label}</span>`}`;
   const srcEl = row.querySelector('.sources');
   if (srcEl) srcEl.innerHTML = `<span class="src-pill community">✓ comunidad</span>`;
-
-  // Actualizar botón editar — actualizar label del queue
-  editQueue = currentResults.map((_,i)=>i).filter(i => currentResults[i].gender==='unknown' || currentResults[i].source==='none');
-  el('editAllBtn').textContent = `Corregir sin datos (${editQueue.length}) →`;
-  el('editAllBtn').style.display = editQueue.length ? 'block' : 'none';
 }
 
-function closeModal() {
-  el('modalOverlay').classList.remove('on');
-  editQueue = [];
-}
+function closeModal() { el('modalOverlay').classList.remove('on'); }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ADMIN
@@ -1178,6 +1229,7 @@ async function openAdmin() {
   el('analyzeBtn').classList.remove('on');
   el('adminPanel').classList.add('on');
   showLoading('Cargando Airtable...');
+
   try {
     const records = [];
     let offset = null;
@@ -1188,16 +1240,27 @@ async function openAdmin() {
       url.searchParams.set('sort[0][direction]','desc');
       if (offset) url.searchParams.set('offset', offset);
       const r    = await fetch(url, { headers:AT_HEADERS });
+      if (!r.ok) throw new Error('Airtable '+r.status);
       const data = await r.json();
       records.push(...(data.records||[]));
       offset = data.offset;
     } while (offset);
+
     hideLoading();
     el('adminTotal').textContent    = records.length;
     el('adminVerified').textContent = records.filter(r=>r.fields.verified).length;
     el('adminUnknown').textContent  = records.filter(r=>!r.fields.gender||r.fields.gender==='unknown').length;
-    const tbody = el('adminTableBody');
-    tbody.innerHTML = '';
+
+    const content = el('adminContent');
+    if (!records.length) {
+      content.innerHTML = '<div class="admin-empty">No hay artistas guardados en la base de datos todavía.<br>Los géneros que corrijas manualmente aparecerán aquí.</div>';
+      return;
+    }
+
+    const table = document.createElement('table');
+    table.className = 'admin-table';
+    table.innerHTML = `<thead><tr><th>Artista</th><th>Tipo</th><th>Género</th><th>Fuente</th><th>✓</th><th>Fecha</th><th></th></tr></thead>`;
+    const tbody = document.createElement('tbody');
     records.forEach(rec => {
       const f  = rec.fields;
       const gc = GENDER_CFG[f.gender]||GENDER_CFG.unknown;
@@ -1207,12 +1270,19 @@ async function openAdmin() {
         <td style="color:var(--muted);font-size:10px">${f.type||'—'}</td>
         <td><span style="color:${gc.color}">${gc.label}</span></td>
         <td style="color:var(--muted);font-size:10px">${esc(f.source||'—')}</td>
-        <td style="text-align:center">${f.verified?'✓':''}</td>
+        <td style="text-align:center;color:var(--accent)">${f.verified?'✓':''}</td>
         <td style="color:var(--muted);font-size:10px">${f.added_at||'—'}</td>
         <td><button class="btn-del" onclick="adminDelete('${rec.id}','${esc(f.name||'')}',this)">borrar</button></td>`;
       tbody.appendChild(tr);
     });
-  } catch(e) { hideLoading(); showError('Error Airtable: '+e.message); }
+    table.appendChild(tbody);
+    content.innerHTML = '';
+    content.appendChild(table);
+
+  } catch(e) {
+    hideLoading();
+    showError('Error al cargar Airtable: ' + e.message);
+  }
 }
 
 function closeAdmin() {
@@ -1225,7 +1295,7 @@ function closeAdmin() {
 }
 
 async function adminDelete(recordId, name, btn) {
-  btn.disabled = true; btn.textContent = '...';
+  btn.disabled=true; btn.textContent='...';
   const ok = await deleteFromAirtable(recordId, name);
   if (ok) btn.closest('tr').remove();
   else { btn.disabled=false; btn.textContent='borrar'; }
