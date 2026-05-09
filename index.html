@@ -17,15 +17,19 @@
   --text:          #e8e8e8;
   --muted:         #555555;
   --accent:        #1db954;
+
   --c-female:      #ff6b9d;
   --c-male:        #4a9eff;
   --c-nb:          #f4c430;
   --c-trans-woman: #ff9de2;
   --c-trans-man:   #74c0fc;
   --c-intersex:    #c084fc;
-  --c-other:       #fb923c;
+  --c-agender:     #94a3b8;
+  --c-fluid:       #fb923c;
+  --c-queer:       #f472b6;
+  --c-other:       #6b7280;
   --c-group:       #a78bfa;
-  --c-unknown:     #3a3a3a;
+  --c-unknown:     #2a2a2a;
 }
 
 html, body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; overflow-x: hidden; }
@@ -41,9 +45,9 @@ body::before {
 /* HEADER */
 header { margin-bottom: 52px; }
 .logo-row { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 10px; flex-wrap: wrap; }
-h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px, 12vw, 96px); letter-spacing: 3px; line-height: .95; }
+h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px,12vw,96px); letter-spacing: 3px; line-height: .95; }
 .badge { font-size: 10px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; border: 1px solid var(--accent); padding: 4px 10px; margin-bottom: 8px; white-space: nowrap; }
-.subtitle { font-size: 12px; color: var(--muted); letter-spacing: .5px; line-height: 1.8; max-width: 520px; }
+.subtitle { font-size: 12px; color: var(--muted); line-height: 1.8; max-width: 520px; }
 
 /* CONFIG */
 .config-panel { background: var(--surface); border: 1px solid var(--border); padding: 28px; margin-bottom: 28px; }
@@ -53,22 +57,20 @@ h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px, 12vw, 96px); 
 .field-input::placeholder { color: var(--muted); }
 .field-hint { font-size: 11px; color: var(--muted); margin-top: 10px; line-height: 1.8; }
 .field-hint a { color: var(--accent); text-decoration: none; }
-.field-hint a:hover { text-decoration: underline; }
-.field-hint code { color: var(--accent); font-family: 'DM Mono', monospace; }
-
+.field-hint code { color: var(--accent); }
 .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: var(--accent); color: #000; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; border: none; padding: 14px 28px; cursor: pointer; width: 100%; margin-top: 20px; transition: opacity .2s, transform .15s; }
 .btn-primary:hover { opacity: .85; transform: translateY(-1px); }
 
 /* USER CARD */
-.user-card { display: none; align-items: center; gap: 16px; background: var(--surface); border: 1px solid var(--border); padding: 14px 20px; margin-bottom: 28px; }
+.user-card { display: none; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border); padding: 14px 20px; margin-bottom: 28px; }
 .user-card.on { display: flex; }
 .user-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); flex-shrink: 0; }
 .user-label { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
-.user-name  { font-size: 13px; margin-top: 2px; }
-.btn-logout { margin-left: auto; background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 6px 12px; cursor: pointer; transition: all .2s; }
-.btn-logout:hover { border-color: var(--text); color: var(--text); }
-.btn-admin { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 6px 12px; cursor: pointer; transition: all .2s; margin-left: 8px; }
-.btn-admin:hover { border-color: var(--accent); color: var(--accent); }
+.user-name { font-size: 13px; margin-top: 2px; }
+.btn-small { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 6px 12px; cursor: pointer; transition: all .2s; white-space: nowrap; }
+.btn-small:hover { border-color: var(--text); color: var(--text); }
+.btn-small.accent:hover { border-color: var(--accent); color: var(--accent); }
+.ml-auto { margin-left: auto; }
 
 /* ERROR */
 .error-box { display: none; background: #1a0a0a; border: 1px solid #550000; color: #ff7070; font-size: 12px; padding: 14px 18px; margin-bottom: 24px; line-height: 1.7; }
@@ -108,106 +110,139 @@ h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px, 12vw, 96px); 
 .results { display: none; }
 .results.on { display: block; }
 
+/* CHART VIEW TOGGLE */
+.chart-toggle { display: flex; gap: 8px; margin-bottom: 20px; }
+.chart-view-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--border); padding: 7px 14px; cursor: pointer; transition: all .2s; }
+.chart-view-btn.active { border-color: var(--accent); color: var(--accent); }
+
+/* NUMBERS GRID */
 .numbers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin-bottom: 36px; }
-.num-cell { background: var(--surface); padding: 22px 16px; text-align: center; }
-.num-big { font-family: 'Bebas Neue', sans-serif; font-size: 46px; line-height: 1; margin-bottom: 4px; }
+.num-cell { background: var(--surface); padding: 20px 14px; text-align: center; }
+.num-big { font-family: 'Bebas Neue', sans-serif; font-size: 42px; line-height: 1; margin-bottom: 4px; }
 .num-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
 .num-count { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
-.bar-row { display: grid; grid-template-columns: 130px 1fr 52px; align-items: center; gap: 14px; margin-bottom: 11px; }
+/* BARS */
+.bar-section-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; margin-top: 4px; }
+.bar-row { display: grid; grid-template-columns: 140px 1fr 52px; align-items: center; gap: 14px; margin-bottom: 10px; }
 .bar-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); text-align: right; }
 .bar-track { height: 5px; background: var(--border); overflow: hidden; }
 .bar-fill { height: 100%; width: 0; transition: width 1s cubic-bezier(.22,1,.36,1); }
 .bar-pct { font-size: 12px; text-align: right; }
+.bars-divider { height: 1px; background: var(--border); margin: 24px 0; }
 
-.section-title { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 40px; margin-bottom: 16px; }
+/* SECTION TITLE */
+.section-title { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 40px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.section-action { font-size: 9px; letter-spacing: 2px; color: var(--accent); cursor: pointer; border: 1px solid var(--accent); padding: 3px 10px; transition: all .2s; background: none; font-family: 'DM Mono', monospace; text-transform: uppercase; }
+.section-action:hover { background: var(--accent); color: #000; }
 
 /* ARTIST LIST */
 .artist-list { display: flex; flex-direction: column; gap: 2px; }
-.artist-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--surface); border-left: 3px solid transparent; transition: background .15s; }
+.artist-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface); border-left: 3px solid transparent; transition: background .15s; }
 .artist-row:hover { background: var(--surface2); }
-.artist-thumb { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: var(--border); flex-shrink: 0; }
-.artist-thumb-empty { width: 36px; height: 36px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
-.artist-name { font-size: 13px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.artist-source-pill { font-size: 9px; letter-spacing: 1px; color: var(--muted); white-space: nowrap; padding: 2px 7px; border: 1px solid var(--border); }
-.artist-source-pill.inferred { color: var(--c-other); border-color: var(--c-other); }
-.artist-source-pill.airtable { color: var(--accent); border-color: var(--accent); }
-.artist-tag { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 8px; border: 1px solid; white-space: nowrap; flex-shrink: 0; }
-.btn-edit { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; cursor: pointer; transition: all .2s; white-space: nowrap; flex-shrink: 0; }
+.artist-row.needs-edit { border-left-color: var(--muted) !important; opacity: .7; }
+.artist-row.needs-edit:hover { opacity: 1; }
+.artist-thumb { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: var(--border); flex-shrink: 0; }
+.artist-thumb-empty { width: 34px; height: 34px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+.artist-name { font-size: 12px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* TAGS */
+.tags { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+.tag { font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; padding: 2px 7px; border: 1px solid; white-space: nowrap; }
+.tag.type  { color: var(--muted); border-color: var(--border); }
+.tag.gender { /* color set inline */ }
+
+/* SOURCE PILLS */
+.sources { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+.src-pill { font-size: 8px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 6px; border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
+.src-pill.hit { border-color: var(--accent); color: var(--accent); }
+.src-pill.community { border-color: #1db954; color: #1db954; }
+.src-pill.inferred { border-color: var(--c-fluid); color: var(--c-fluid); }
+
+/* EDIT BTN */
+.btn-edit { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 7px; cursor: pointer; transition: all .2s; white-space: nowrap; flex-shrink: 0; }
 .btn-edit:hover { border-color: var(--accent); color: var(--accent); }
 
 /* LEGEND */
-.legend { display: none; flex-wrap: wrap; gap: 14px; padding: 18px 20px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 32px; }
+.legend { display: none; flex-wrap: wrap; gap: 12px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 32px; }
 .legend.on { display: flex; }
-.legend-item { display: flex; align-items: center; gap: 7px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
-.legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.legend-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
 /* MODAL */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 100; align-items: center; justify-content: center; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.88); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
 .modal-overlay.on { display: flex; }
-.modal { background: var(--surface); border: 1px solid var(--border); padding: 32px; width: 100%; max-width: 420px; margin: 24px; }
-.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; margin-bottom: 6px; }
-.modal-artist { font-size: 12px; color: var(--muted); margin-bottom: 24px; }
+.modal { background: var(--surface); border: 1px solid var(--border); padding: 28px; width: 100%; max-width: 460px; }
+.modal-nav { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-bottom: 16px; }
+.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; margin-bottom: 4px; }
+.modal-artist { font-size: 13px; color: var(--text); margin-bottom: 24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.modal-section { margin-bottom: 20px; }
 .modal-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-.gender-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 24px; }
-.gender-opt { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 10px 8px; cursor: pointer; transition: all .2s; text-align: center; }
-.gender-opt:hover { border-color: var(--text); color: var(--text); }
-.gender-opt.selected { color: #000; }
-.modal-actions { display: flex; gap: 10px; }
+
+/* SELECTS */
+.modal-select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 10px 12px; outline: none; cursor: pointer; transition: border-color .2s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23555'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+.modal-select:focus { border-color: var(--accent); }
+.modal-select option { background: var(--surface); }
+
+/* GROUP COMPOSITION (hidden unless group) */
+.composition-section { display: none; }
+.composition-section.on { display: block; }
+
+.modal-actions { display: flex; gap: 10px; margin-top: 24px; }
 .btn-save { flex: 1; background: var(--accent); color: #000; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; border: none; padding: 12px; cursor: pointer; transition: opacity .2s; }
 .btn-save:hover { opacity: .85; }
-.btn-cancel { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 20px; cursor: pointer; transition: all .2s; }
-.btn-cancel:hover { border-color: var(--text); color: var(--text); }
+.btn-save:disabled { opacity: .4; cursor: not-allowed; }
+.btn-skip { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 16px; cursor: pointer; transition: all .2s; }
+.btn-skip:hover { border-color: var(--text); color: var(--text); }
+.btn-close-modal { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 16px; cursor: pointer; transition: all .2s; }
+.btn-close-modal:hover { border-color: var(--text); color: var(--text); }
 
-/* ADMIN PANEL */
+/* ADMIN */
 .admin-panel { display: none; }
 .admin-panel.on { display: block; }
 .admin-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
 .admin-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; }
-.admin-close { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 6px 12px; cursor: pointer; margin-left: auto; transition: all .2s; }
-.admin-close:hover { border-color: var(--text); color: var(--text); }
 .admin-stats { display: flex; gap: 1px; background: var(--border); margin-bottom: 24px; }
 .admin-stat { background: var(--surface); padding: 16px 20px; flex: 1; text-align: center; }
 .admin-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--accent); }
 .admin-stat-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
-.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .admin-table th { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
-.admin-table td { font-size: 12px; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.admin-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 .admin-table tr:hover td { background: var(--surface2); }
-.admin-delete { background: none; border: 1px solid #550000; color: #ff7070; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; cursor: pointer; transition: all .2s; }
-.admin-delete:hover { background: #550000; }
+.btn-del { background: none; border: 1px solid #550000; color: #ff7070; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; cursor: pointer; transition: all .2s; }
+.btn-del:hover { background: #550000; }
 
-footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 10px; color: var(--muted); letter-spacing: .5px; line-height: 1.9; }
+footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 10px; color: var(--muted); line-height: 1.9; }
 
 @media (max-width: 600px) {
-  .numbers-grid { grid-template-columns: repeat(2, 1fr); }
-  .bar-row { grid-template-columns: 90px 1fr 40px; }
+  .numbers-grid { grid-template-columns: repeat(2,1fr); }
+  .bar-row { grid-template-columns: 100px 1fr 40px; }
+  .bar-label { font-size: 9px; }
 }
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- HEADER -->
   <header>
     <div class="logo-row">
       <h1>GENDER<br>SPLIT</h1>
       <span class="badge">Spotify + MusicBrainz + TheAudioDB</span>
     </div>
     <p class="subtitle">
-      Analizá el desglose de género de los artistas que escuchás.<br>
-      Fuentes: MusicBrainz → TheAudioDB → inferencia por nombre.<br>
-      Correcciones colaborativas guardadas en base de datos compartida.
+      Desglose de género de los artistas que escuchás.<br>
+      Fuentes: MusicBrainz → TheAudioDB → base colaborativa → nombre.
     </p>
   </header>
 
-  <!-- CONFIG -->
   <div class="config-panel" id="configPanel">
     <div class="field-label">Spotify Client ID</div>
     <input class="field-input" id="clientInput" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false"/>
     <div class="field-hint">
-      Crear app en <a href="https://developer.spotify.com/dashboard" target="_blank">developer.spotify.com/dashboard</a>.<br>
-      Redirect URI: <code id="redirectDisplay">cargando...</code>
+      App en <a href="https://developer.spotify.com/dashboard" target="_blank">developer.spotify.com/dashboard</a>.
+      Redirect URI: <code id="redirectDisplay">—</code>
     </div>
     <button class="btn-primary" onclick="login()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
@@ -215,27 +250,23 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
     </button>
   </div>
 
-  <!-- USER CARD -->
   <div class="user-card" id="userCard">
     <img class="user-avatar" id="userAvatar" src="" alt=""/>
     <div>
       <div class="user-label">Conectado como</div>
       <div class="user-name" id="userName">—</div>
     </div>
-    <button class="btn-admin" onclick="openAdmin()">Admin ↗</button>
-    <button class="btn-logout" onclick="logout()">Salir</button>
+    <button class="btn-small accent ml-auto" onclick="openAdmin()">Admin</button>
+    <button class="btn-small" onclick="logout()">Salir</button>
   </div>
 
-  <!-- ERROR -->
   <div class="error-box" id="errorBox"></div>
 
-  <!-- TABS -->
   <div class="tabs" id="tabs">
     <button class="tab active" id="tab-liked" onclick="switchTab('liked')">Me gusta</button>
     <button class="tab" id="tab-top" onclick="switchTab('top')">Top artistas</button>
   </div>
 
-  <!-- FILTROS ME GUSTA -->
   <div class="filters on" id="likedFilters">
     <button class="fbtn active" id="lf-all" onclick="setLikedPeriod('all')">Desde siempre</button>
     <button class="fbtn" id="lf-5y" onclick="setLikedPeriod('5y')">Últimos 5 años</button>
@@ -243,30 +274,23 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
     <button class="fbtn" id="lf-1y" onclick="setLikedPeriod('1y')">Último año</button>
   </div>
 
-  <!-- FILTROS TOP -->
   <div class="filters" id="topFilters">
     <button class="fbtn active" id="tf-short_term"  onclick="setRange('short_term')">Último mes</button>
     <button class="fbtn" id="tf-medium_term" onclick="setRange('medium_term')">6 meses</button>
     <button class="fbtn" id="tf-long_term"   onclick="setRange('long_term')">Todo el tiempo</button>
   </div>
 
-  <!-- ANALIZAR -->
   <button class="btn-analyze" id="analyzeBtn" onclick="analyze()">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
     Analizar
   </button>
 
-  <!-- LOADING -->
   <div class="loading" id="loadingEl">
-    <div class="loading-row">
-      <div class="spinner"></div>
-      <span id="loadingText">Cargando...</span>
-    </div>
+    <div class="loading-row"><div class="spinner"></div><span id="loadingText">Cargando...</span></div>
     <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
     <div class="loading-note" id="loadingNote"></div>
   </div>
 
-  <!-- LEYENDA -->
   <div class="legend" id="legendEl">
     <div class="legend-item"><div class="legend-dot" style="background:var(--c-female)"></div>Mujer</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--c-male)"></div>Hombre</div>
@@ -274,119 +298,154 @@ footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid var(--border
     <div class="legend-item"><div class="legend-dot" style="background:var(--c-trans-woman)"></div>Mujer trans</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--c-trans-man)"></div>Hombre trans</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--c-intersex)"></div>Intersex</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-agender)"></div>Agénero</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-fluid)"></div>Género fluido</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-queer)"></div>Queer</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--c-other)"></div>Otro</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--c-group)"></div>Grupo / Banda</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--c-group)"></div>Grupo/Banda</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--c-unknown)"></div>Sin datos</div>
   </div>
 
-  <!-- RESULTS -->
   <div class="results" id="resultsEl">
+    <div class="chart-toggle">
+      <button class="chart-view-btn active" id="cv-separate" onclick="setChartView('separate')">Separado</button>
+      <button class="chart-view-btn" id="cv-combined" onclick="setChartView('combined')">Combinado</button>
+    </div>
     <div class="numbers-grid" id="numbersGrid"></div>
     <div id="barsContainer"></div>
-    <div class="section-title" id="artistsTitle">Artistas</div>
+    <div class="section-title">
+      <span id="artistsTitle">Artistas</span>
+      <button class="section-action" id="editAllBtn" onclick="startEditQueue()">Corregir sin datos →</button>
+    </div>
     <div class="artist-list" id="artistList"></div>
   </div>
 
-  <!-- ADMIN PANEL -->
+  <!-- ADMIN -->
   <div class="admin-panel" id="adminPanel">
     <div class="admin-header">
       <div class="admin-title">ADMIN</div>
-      <button class="admin-close" onclick="closeAdmin()">← Volver</button>
+      <button class="btn-small ml-auto" onclick="closeAdmin()">← Volver</button>
     </div>
     <div class="admin-stats">
-      <div class="admin-stat">
-        <div class="admin-stat-num" id="adminTotal">—</div>
-        <div class="admin-stat-label">Total artistas</div>
-      </div>
-      <div class="admin-stat">
-        <div class="admin-stat-num" id="adminVerified">—</div>
-        <div class="admin-stat-label">Verificados</div>
-      </div>
-      <div class="admin-stat">
-        <div class="admin-stat-num" id="adminUnknown">—</div>
-        <div class="admin-stat-label">Sin datos</div>
-      </div>
+      <div class="admin-stat"><div class="admin-stat-num" id="adminTotal">—</div><div class="admin-stat-label">Total</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="adminVerified">—</div><div class="admin-stat-label">Verificados</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="adminUnknown">—</div><div class="admin-stat-label">Sin datos</div></div>
     </div>
     <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Artista</th>
-          <th>Género</th>
-          <th>Fuente</th>
-          <th>Verificado</th>
-          <th>Fecha</th>
-          <th></th>
-        </tr>
-      </thead>
+      <thead><tr><th>Artista</th><th>Tipo</th><th>Género</th><th>Fuente</th><th>✓</th><th>Fecha</th><th></th></tr></thead>
       <tbody id="adminTableBody"></tbody>
     </table>
   </div>
 
-  <!-- MODAL EDICIÓN -->
+  <!-- MODAL -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
+      <div class="modal-nav" id="modalNav">— / —</div>
       <div class="modal-title">EDITAR</div>
       <div class="modal-artist" id="modalArtistName">—</div>
-      <div class="modal-label">Seleccioná el género</div>
-      <div class="gender-options" id="genderOptions"></div>
+
+      <div class="modal-section">
+        <div class="modal-label">Tipo</div>
+        <select class="modal-select" id="selectType" onchange="onTypeChange()">
+          <option value="solo">Solista</option>
+          <option value="group">Grupo / Banda</option>
+        </select>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label">Género</div>
+        <select class="modal-select" id="selectGender">
+          <option value="female">Mujer</option>
+          <option value="male">Hombre</option>
+          <option value="non-binary">No binario</option>
+          <option value="trans-woman">Mujer trans</option>
+          <option value="trans-man">Hombre trans</option>
+          <option value="intersex">Intersex</option>
+          <option value="agender">Agénero</option>
+          <option value="fluid">Género fluido</option>
+          <option value="queer">Queer</option>
+          <option value="other">Otro</option>
+          <option value="unknown">Sin datos</option>
+        </select>
+      </div>
+
+      <div class="modal-section composition-section" id="compositionSection">
+        <div class="modal-label">Composición del grupo</div>
+        <select class="modal-select" id="selectComposition">
+          <option value="majority-female">Mayoría mujeres</option>
+          <option value="majority-male">Mayoría hombres</option>
+          <option value="mixed">Mixto</option>
+          <option value="majority-nb">Mayoría no binario/queer</option>
+          <option value="unknown">Sin datos de composición</option>
+        </select>
+      </div>
+
       <div class="modal-actions">
-        <button class="btn-save" onclick="saveEdit()">Guardar</button>
-        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-save" id="btnSave" onclick="saveEdit()">Guardar y siguiente</button>
+        <button class="btn-skip" onclick="skipEdit()">Saltar</button>
+        <button class="btn-close-modal" onclick="closeModal()">Cerrar</button>
       </div>
     </div>
   </div>
 
   <footer>
-    Gender Split — Spotify Web API + MusicBrainz + TheAudioDB.<br>
-    Correcciones manuales guardadas en base colaborativa. Género declarado tiene prioridad sobre inferencia por nombre.<br>
-    ★ = inferido por nombre (aproximado) · ✓ = verificado manualmente
+    Gender Split — Spotify + MusicBrainz + TheAudioDB + base colaborativa.<br>
+    ★ = inferido por nombre · ✓ = verificado · MusicBrainz / TheAudioDB = fuente declarada
   </footer>
 
 </div>
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
-// AIRTABLE CONFIG
+// AIRTABLE
 // ─────────────────────────────────────────────────────────────────────────────
-const AT_BASE   = 'appmlFpQILICQWOnz';
-const AT_TABLE  = 'artists';
-const AT_TOKEN  = 'patrwa42Tl8zqf2fm';
-const AT_URL    = `https://api.airtable.com/v0/${AT_BASE}/${AT_TABLE}`;
-const AT_HEADERS = {
-  'Authorization': `Bearer ${AT_TOKEN}`,
-  'Content-Type': 'application/json',
-};
+const AT_BASE    = 'appmlFpQILICQWOnz';
+const AT_TABLE   = 'artists';
+const AT_TOKEN   = 'patrwa42Tl8zqf2fm';
+const AT_URL     = `https://api.airtable.com/v0/${AT_BASE}/${AT_TABLE}`;
+const AT_HEADERS = { 'Authorization': `Bearer ${AT_TOKEN}`, 'Content-Type': 'application/json' };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GÉNERO CONFIG
 // ─────────────────────────────────────────────────────────────────────────────
 const GENDER_CFG = {
-  'female':      { label: 'Mujer',         color: 'var(--c-female)' },
-  'male':        { label: 'Hombre',        color: 'var(--c-male)' },
-  'non-binary':  { label: 'No binario',    color: 'var(--c-nb)' },
-  'trans-woman': { label: 'Mujer trans',   color: 'var(--c-trans-woman)' },
-  'trans-man':   { label: 'Hombre trans',  color: 'var(--c-trans-man)' },
-  'intersex':    { label: 'Intersex',      color: 'var(--c-intersex)' },
-  'other':       { label: 'Otro',          color: 'var(--c-other)' },
-  'group':       { label: 'Grupo / Banda', color: 'var(--c-group)' },
-  'unknown':     { label: 'Sin datos',     color: 'var(--c-unknown)' },
+  'female':           { label: 'Mujer',          color: 'var(--c-female)' },
+  'male':             { label: 'Hombre',          color: 'var(--c-male)' },
+  'non-binary':       { label: 'No binario',      color: 'var(--c-nb)' },
+  'trans-woman':      { label: 'Mujer trans',     color: 'var(--c-trans-woman)' },
+  'trans-man':        { label: 'Hombre trans',    color: 'var(--c-trans-man)' },
+  'intersex':         { label: 'Intersex',        color: 'var(--c-intersex)' },
+  'agender':          { label: 'Agénero',         color: 'var(--c-agender)' },
+  'fluid':            { label: 'Género fluido',   color: 'var(--c-fluid)' },
+  'queer':            { label: 'Queer',           color: 'var(--c-queer)' },
+  'other':            { label: 'Otro',            color: 'var(--c-other)' },
+  'group':            { label: 'Grupo/Banda',     color: 'var(--c-group)' },
+  'unknown':          { label: 'Sin datos',       color: 'var(--c-unknown)' },
 };
-const GENDER_ORDER = ['female','male','non-binary','trans-woman','trans-man','intersex','other','group','unknown'];
 
-// MusicBrainz gender map
-const MB_GENDER = { 'Male':'male','Female':'female','Non-binary':'non-binary','Other':'other' };
+const COMPOSITION_CFG = {
+  'majority-female': { label: 'May. mujeres',   color: 'var(--c-female)' },
+  'majority-male':   { label: 'May. hombres',   color: 'var(--c-male)' },
+  'mixed':           { label: 'Mixto',           color: 'var(--c-group)' },
+  'majority-nb':     { label: 'May. NB/Queer',  color: 'var(--c-nb)' },
+  'unknown':         { label: 'Comp. desconocida', color: 'var(--c-unknown)' },
+};
+
+const GENDER_ORDER = ['female','male','non-binary','trans-woman','trans-man','intersex','agender','fluid','queer','other','group','unknown'];
+const MB_GENDER    = { 'Male':'male','Female':'female','Non-binary':'non-binary','Other':'other' };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STATE
 // ─────────────────────────────────────────────────────────────────────────────
-let token       = null;
-let currentTab  = 'liked';
-let likedPeriod = 'all';
-let topRange    = 'short_term';
+let token          = null;
+let currentTab     = 'liked';
+let likedPeriod    = 'all';
+let topRange       = 'short_term';
 let currentResults = [];
-let editingArtist  = null;
-let selectedGender = null;
-const mbCache   = new Map();
-const atCache   = new Map(); // cache de correcciones de Airtable
+let chartView      = 'separate'; // 'separate' | 'combined'
+let editQueue      = [];   // indices de artistas sin datos
+let editQueuePos   = 0;
+const mbCache      = new Map();
+const atCache      = new Map();
 
 const REDIRECT_URI = window.location.href.split('?')[0].split('#')[0];
 
@@ -397,68 +456,49 @@ window.addEventListener('load', async () => {
   el('redirectDisplay').textContent = REDIRECT_URI;
   const saved = localStorage.getItem('gsp_cid');
   if (saved) el('clientInput').value = saved;
-
   const code = new URLSearchParams(location.search).get('code');
   if (code) await handleCallback(code);
-
-  // Pre-cargar correcciones de Airtable en cache
-  loadAirtableCache();
+  loadAtCache();
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AIRTABLE
+// AIRTABLE HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
-async function loadAirtableCache() {
+async function loadAtCache() {
   try {
     let offset = null;
     do {
       const url = new URL(AT_URL);
       url.searchParams.set('pageSize', '100');
       if (offset) url.searchParams.set('offset', offset);
-      const r = await fetch(url, { headers: AT_HEADERS });
+      const r    = await fetch(url, { headers: AT_HEADERS });
       const data = await r.json();
       for (const rec of (data.records || [])) {
-        const name = rec.fields.name?.toLowerCase().trim();
-        if (name) atCache.set(name, { gender: rec.fields.gender, source: 'community', recordId: rec.id, verified: rec.fields.verified });
+        const key = rec.fields.name?.toLowerCase().trim();
+        if (key) atCache.set(key, { gender: rec.fields.gender, type: rec.fields.type, composition: rec.fields.composition, source: 'community', verified: rec.fields.verified, recordId: rec.id });
       }
       offset = data.offset;
     } while (offset);
-  } catch(e) { /* continuar sin cache */ }
+  } catch(e) {}
 }
 
-async function saveToAirtable(name, gender, source) {
-  const key = name.toLowerCase().trim();
+async function saveToAirtable(name, type, gender, composition) {
+  const key      = name.toLowerCase().trim();
   const existing = atCache.get(key);
-
+  const fields   = { name, type, gender, composition: composition || '', verified: true, added_at: new Date().toISOString().split('T')[0], source: 'manual' };
   try {
+    let recordId;
     if (existing?.recordId) {
-      // Update
-      await fetch(`${AT_URL}/${existing.recordId}`, {
-        method: 'PATCH',
-        headers: AT_HEADERS,
-        body: JSON.stringify({ fields: { gender, source, verified: true } }),
-      });
-      atCache.set(key, { ...existing, gender, source, verified: true });
+      await fetch(`${AT_URL}/${existing.recordId}`, { method: 'PATCH', headers: AT_HEADERS, body: JSON.stringify({ fields }) });
+      recordId = existing.recordId;
     } else {
-      // Create
-      const r = await fetch(AT_URL, {
-        method: 'POST',
-        headers: AT_HEADERS,
-        body: JSON.stringify({ fields: {
-          name,
-          gender,
-          source,
-          verified: true,
-          added_at: new Date().toISOString().split('T')[0],
-        }}),
-      });
+      const r    = await fetch(AT_URL, { method: 'POST', headers: AT_HEADERS, body: JSON.stringify({ fields }) });
       const data = await r.json();
-      atCache.set(key, { gender, source, verified: true, recordId: data.id });
+      recordId   = data.id;
     }
+    atCache.set(key, { ...fields, source: 'community', verified: true, recordId });
     return true;
-  } catch(e) {
-    return false;
-  }
+  } catch(e) { return false; }
 }
 
 async function deleteFromAirtable(recordId, name) {
@@ -477,29 +517,24 @@ function randomString(len) {
   crypto.getRandomValues(arr);
   return btoa(String.fromCharCode(...arr)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'').slice(0,len);
 }
-
 async function sha256(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
   return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
-
 async function login() {
   const cid = el('clientInput').value.trim();
   if (!cid) { showError('Ingresá tu Client ID.'); return; }
   localStorage.setItem('gsp_cid', cid);
   const verifier = randomString(64);
-  const challenge = await sha256(verifier);
   localStorage.setItem('gsp_verifier', verifier);
-  const params = new URLSearchParams({ client_id: cid, response_type: 'code', redirect_uri: REDIRECT_URI, scope: 'user-top-read user-library-read', code_challenge_method: 'S256', code_challenge: challenge });
+  const challenge = await sha256(verifier);
+  const params = new URLSearchParams({ client_id:cid, response_type:'code', redirect_uri:REDIRECT_URI, scope:'user-top-read user-library-read', code_challenge_method:'S256', code_challenge:challenge });
   location.href = 'https://accounts.spotify.com/authorize?' + params;
 }
-
 async function handleCallback(code) {
-  const cid = localStorage.getItem('gsp_cid');
-  const verifier = localStorage.getItem('gsp_verifier');
-  const body = new URLSearchParams({ client_id: cid, grant_type: 'authorization_code', code, redirect_uri: REDIRECT_URI, code_verifier: verifier });
+  const body = new URLSearchParams({ client_id:localStorage.getItem('gsp_cid'), grant_type:'authorization_code', code, redirect_uri:REDIRECT_URI, code_verifier:localStorage.getItem('gsp_verifier') });
   try {
-    const r = await fetch('https://accounts.spotify.com/api/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+    const r    = await fetch('https://accounts.spotify.com/api/token', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body });
     const data = await r.json();
     if (!r.ok || !data.access_token) { showError('Error Spotify: ' + (data.error_description || data.error)); return; }
     token = data.access_token;
@@ -507,7 +542,6 @@ async function handleCallback(code) {
     await onLoggedIn();
   } catch(e) { showError('Error de red: ' + e.message); }
 }
-
 function logout() {
   token = null;
   ['userCard','tabs','resultsEl','legendEl'].forEach(id => el(id).classList.remove('on'));
@@ -517,7 +551,6 @@ function logout() {
   el('configPanel').style.display = 'block';
   el('adminPanel').classList.remove('on');
 }
-
 async function onLoggedIn() {
   el('configPanel').style.display = 'none';
   el('tabs').classList.add('on');
@@ -533,13 +566,13 @@ async function onLoggedIn() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SPOTIFY API
+// SPOTIFY
 // ─────────────────────────────────────────────────────────────────────────────
 async function spotifyFetch(path, params = {}) {
   const url = new URL('https://api.spotify.com/v1' + path);
   Object.entries(params).forEach(([k,v]) => url.searchParams.set(k,v));
-  const r = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
-  if (!r.ok) throw new Error('Spotify ' + r.status);
+  const r = await fetch(url, { headers:{ Authorization:'Bearer '+token } });
+  if (!r.ok) throw new Error('Spotify '+r.status);
   return r.json();
 }
 
@@ -549,21 +582,27 @@ async function spotifyFetch(path, params = {}) {
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el('tab-' + tab).classList.add('active');
-  el('likedFilters').classList.toggle('on', tab === 'liked');
-  el('topFilters').classList.toggle('on', tab === 'top');
+  el('tab-'+tab).classList.add('active');
+  el('likedFilters').classList.toggle('on', tab==='liked');
+  el('topFilters').classList.toggle('on', tab==='top');
   el('resultsEl').classList.remove('on');
   el('legendEl').classList.remove('on');
 }
 function setLikedPeriod(p) {
   likedPeriod = p;
   document.querySelectorAll('#likedFilters .fbtn').forEach(b => b.classList.remove('active'));
-  el('lf-' + p).classList.add('active');
+  el('lf-'+p).classList.add('active');
 }
 function setRange(r) {
   topRange = r;
   document.querySelectorAll('#topFilters .fbtn').forEach(b => b.classList.remove('active'));
-  el('tf-' + r).classList.add('active');
+  el('tf-'+r).classList.add('active');
+}
+function setChartView(v) {
+  chartView = v;
+  document.querySelectorAll('.chart-view-btn').forEach(b => b.classList.remove('active'));
+  el('cv-'+v).classList.add('active');
+  if (currentResults.length) renderCharts(currentResults);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -576,12 +615,11 @@ async function analyze() {
   setProgress(0);
   el('loadingNote').textContent = '';
   showLoading('Obteniendo artistas...');
-
   try {
     const artists = currentTab === 'liked' ? await getLikedArtists() : await getTopArtists();
     if (!artists.length) { hideLoading(); showError('No se encontraron artistas.'); return; }
     await enrichImages(artists);
-    el('loadingNote').textContent = 'Consultando MusicBrainz → TheAudioDB → base colaborativa...';
+    el('loadingNote').textContent = 'MusicBrainz → TheAudioDB → base colaborativa...';
     currentResults = await classifyAll(artists);
     hideLoading();
     renderResults(currentResults);
@@ -591,31 +629,26 @@ async function analyze() {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FETCH ARTISTS
-// ─────────────────────────────────────────────────────────────────────────────
 async function getLikedArtists() {
   const map = new Map();
-  let offset = 0;
-  const limit = 50;
-  let cutoff = null;
+  let offset = 0; const limit = 50; let cutoff = null;
   if (likedPeriod !== 'all') { cutoff = new Date(); cutoff.setFullYear(cutoff.getFullYear() - parseInt(likedPeriod)); }
   const labels = { all:'desde siempre','1y':'del último año','3y':'de los últimos 3 años','5y':'de los últimos 5 años' };
   setLoadingText('Cargando canciones ' + labels[likedPeriod] + '...');
   while (true) {
     const data = await spotifyFetch('/me/tracks', { limit, offset });
     let done = false;
-    for (const item of (data.items || [])) {
+    for (const item of (data.items||[])) {
       if (!item.track) continue;
       if (cutoff && new Date(item.added_at) < cutoff) { done = true; break; }
       for (const a of item.track.artists) {
-        if (!map.has(a.id)) map.set(a.id, { id: a.id, name: a.name, image: null });
+        if (!map.has(a.id)) map.set(a.id, { id:a.id, name:a.name, image:null });
       }
     }
-    const loaded = Math.min(offset + limit, data.total);
+    const loaded = Math.min(offset+limit, data.total);
     setLoadingText(`Canciones: ${loaded}/${data.total} — ${map.size} artistas únicos`);
-    setProgress(loaded / Math.min(data.total, 2500) * 20);
-    if (done || !data.next || offset + limit >= data.total) break;
+    setProgress(loaded / Math.min(data.total,2500) * 20);
+    if (done || !data.next || offset+limit >= data.total) break;
     offset += limit;
     if (offset >= 2500) break;
   }
@@ -624,18 +657,18 @@ async function getLikedArtists() {
 
 async function getTopArtists() {
   setLoadingText('Cargando top artistas...');
-  const data = await spotifyFetch('/me/top/artists', { time_range: topRange, limit: 50 });
-  return (data.items || []).map(a => ({ id: a.id, name: a.name, image: a.images.length ? a.images[a.images.length-1].url : null }));
+  const data = await spotifyFetch('/me/top/artists', { time_range:topRange, limit:50 });
+  return (data.items||[]).map(a => ({ id:a.id, name:a.name, image:a.images.length ? a.images[a.images.length-1].url : null }));
 }
 
 async function enrichImages(artists) {
   const noImg = artists.filter(a => !a.image && a.id);
   for (let i = 0; i < noImg.length; i += 50) {
     try {
-      const ids = noImg.slice(i,i+50).map(a => a.id).join(',');
+      const ids  = noImg.slice(i,i+50).map(a=>a.id).join(',');
       const data = await spotifyFetch('/artists', { ids });
       for (const ar of data.artists) {
-        const found = artists.find(a => a.id === ar.id);
+        const found = artists.find(a => a.id===ar.id);
         if (found && ar.images.length) found.image = ar.images[ar.images.length-1].url;
       }
     } catch(e) {}
@@ -643,120 +676,138 @@ async function enrichImages(artists) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MUSICBRAINZ — batching de hasta 25 artistas por query
+// MUSICBRAINZ — 3 en paralelo, sigue a TheAudioDB si no hay género
 // ─────────────────────────────────────────────────────────────────────────────
-const MB_BASE = 'https://musicbrainz.org/ws/2';
+const MB_BASE   = 'https://musicbrainz.org/ws/2';
+const GROUP_TYPES_MB = ['Group','Orchestra','Choir','Character'];
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function sleep(ms) { return new Promise(r => setTimeout(r,ms)); }
 
-async function mbLookupBatch(artists) {
-  const results = new Map();
-  // MusicBrainz no tiene batch por nombre, pero podemos hacer requests en paralelo
-  // con un throttle suave — 3 en paralelo con 400ms de gap
-  const PARALLEL = 3;
-  for (let i = 0; i < artists.length; i += PARALLEL) {
-    const batch = artists.slice(i, i + PARALLEL);
-    await Promise.all(batch.map(async (a) => {
-      const key = a.name.toLowerCase().trim();
-      if (mbCache.has(key)) { results.set(key, mbCache.get(key)); return; }
-      try {
-        const url = `${MB_BASE}/artist?query=artist:"${encodeURIComponent(a.name)}"&limit=1&fmt=json`;
-        const r = await fetch(url, { headers: { 'Accept': 'application/json', 'User-Agent': 'GenderSplit/2.0' } });
-        if (!r.ok) { results.set(key, null); return; }
-        const data = await r.json();
-        const hit = data.artists?.[0];
-        if (!hit) { results.set(key, null); mbCache.set(key, null); return; }
+async function mbLookup(name) {
+  const key = name.toLowerCase().trim();
+  if (mbCache.has(key)) return mbCache.get(key);
+  try {
+    const url  = `${MB_BASE}/artist?query=artist:"${encodeURIComponent(name)}"&limit=1&fmt=json`;
+    const r    = await fetch(url, { headers:{ 'Accept':'application/json','User-Agent':'GenderSplit/2.0' } });
+    if (!r.ok) { mbCache.set(key,null); return null; }
+    const data = await r.json();
+    const hit  = data.artists?.[0];
+    if (!hit)  { mbCache.set(key,null); return null; }
 
-        const GROUP_TYPES = ['Group','Orchestra','Choir','Character'];
-        let gender = null;
+    // Siempre reportar si encontró el artista, aunque no tenga género
+    const isGroup  = GROUP_TYPES_MB.includes(hit.type);
+    const hasGender = !!hit.gender;
 
-        if (GROUP_TYPES.includes(hit.type)) {
-          gender = 'group';
-        } else if (hit.gender) {
-          gender = MB_GENDER[hit.gender] || 'other';
-        }
-
-        const result = gender ? { gender, source: 'MusicBrainz' } : null;
-        results.set(key, result);
-        mbCache.set(key, result);
-      } catch(e) { results.set(key, null); }
-    }));
-    await sleep(400);
-  }
-  return results;
+    let result;
+    if (isGroup) {
+      result = { found:true, gender:'group', type:'group', source:'MusicBrainz', hasData:true };
+    } else if (hasGender) {
+      result = { found:true, gender: MB_GENDER[hit.gender]||'other', type:'solo', source:'MusicBrainz', hasData:true };
+    } else {
+      // Encontrado pero sin género — reportar found:true, hasData:false para que siga a TheAudioDB
+      result = { found:true, gender:null, type: isGroup?'group':'solo', source:'MusicBrainz', hasData:false };
+    }
+    mbCache.set(key, result);
+    return result;
+  } catch(e) { mbCache.set(key,null); return null; }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// THEAUDIODB — gratuito, sin auth, buena cobertura
+// THEAUDIODB
 // ─────────────────────────────────────────────────────────────────────────────
 const TADB_BASE = 'https://www.theaudiodb.com/api/v1/json/2';
 
-// TheAudioDB tiene campo strGender en artistas
 async function tadbLookup(name) {
   try {
-    const url = `${TADB_BASE}/search.php?s=${encodeURIComponent(name)}`;
-    const r = await fetch(url);
+    const r    = await fetch(`${TADB_BASE}/search.php?s=${encodeURIComponent(name)}`);
     if (!r.ok) return null;
     const data = await r.json();
-    const artist = data.artists?.[0];
-    if (!artist) return null;
-
-    // strGender: "Male", "Female", "Group" etc.
-    const g = artist.strGender?.toLowerCase();
-    const genderMap = { 'male':'male','female':'female','group':'group','mixed group':'group','band':'group' };
-    const gender = genderMap[g] || null;
-    if (!gender) return null;
-
-    return { gender, source: 'TheAudioDB' };
+    const a    = data.artists?.[0];
+    if (!a) return null;
+    const gMap = { 'male':'male','female':'female','group':'group','mixed group':'group','band':'group' };
+    const g    = gMap[a.strGender?.toLowerCase()];
+    if (!g) return null;
+    const type = ['group','mixed group','band'].includes(a.strGender?.toLowerCase()) ? 'group' : 'solo';
+    return { found:true, gender:g, type, source:'TheAudioDB', hasData:true };
   } catch(e) { return null; }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CLASSIFY ALL — pipeline: Airtable → MusicBrainz → TheAudioDB → nombre
+// CLASSIFY ALL
+// Pipeline: Airtable → MusicBrainz → TheAudioDB (si MB no tiene género) → nombre
 // ─────────────────────────────────────────────────────────────────────────────
 async function classifyAll(artists) {
-  const total = artists.length;
-  const results = artists.map(a => ({ ...a, gender: 'unknown', source: 'none' }));
+  const total   = artists.length;
+  const results = artists.map(a => ({
+    ...a,
+    gender:      'unknown',
+    type:        'solo',
+    composition: 'unknown',
+    source:      'none',
+    mbFound:     false,   // MusicBrainz encontró el artista?
+    mbHasData:   false,   // MusicBrainz tenía género?
+    tadbFound:   false,   // TheAudioDB encontró el artista?
+    tadbHasData: false,   // TheAudioDB tenía género?
+  }));
 
-  // PASO 1 — Airtable (cache ya cargado)
+  // PASO 1 — Airtable
   for (const a of results) {
     const hit = atCache.get(a.name.toLowerCase().trim());
-    if (hit) { a.gender = hit.gender; a.source = 'community'; a.verified = hit.verified; a.atRecordId = hit.recordId; }
+    if (hit) {
+      a.gender = hit.gender; a.type = hit.type||'solo';
+      a.composition = hit.composition||'unknown';
+      a.source = 'community'; a.verified = true;
+    }
   }
-  const needClassify = results.filter(a => a.source === 'none');
+  const needClass = results.filter(a => a.source === 'none');
   setProgress(15);
 
-  // PASO 2 — MusicBrainz en paralelo
-  setLoadingText(`MusicBrainz: 0/${needClassify.length}...`);
-  const MB_BATCH = 3;
-  for (let i = 0; i < needClassify.length; i += MB_BATCH) {
-    const batch = needClassify.slice(i, i + MB_BATCH);
-    const mbMap = await mbLookupBatch(batch);
-    for (const a of batch) {
-      const hit = mbMap.get(a.name.toLowerCase().trim());
-      if (hit) { a.gender = hit.gender; a.source = hit.source; }
-    }
-    setLoadingText(`MusicBrainz: ${Math.min(i + MB_BATCH, needClassify.length)}/${needClassify.length}`);
-    setProgress(15 + (i / needClassify.length) * 45);
+  // PASO 2 — MusicBrainz (3 en paralelo)
+  const PARALLEL = 3;
+  for (let i = 0; i < needClass.length; i += PARALLEL) {
+    const batch = needClass.slice(i, i+PARALLEL);
+    setLoadingText(`MusicBrainz: ${Math.min(i+PARALLEL, needClass.length)}/${needClass.length}`);
+    await Promise.all(batch.map(async a => {
+      const hit = await mbLookup(a.name);
+      a.mbFound   = !!hit?.found;
+      a.mbHasData = !!hit?.hasData;
+      if (hit?.hasData) {
+        a.gender = hit.gender; a.type = hit.type; a.source = 'MusicBrainz';
+      }
+    }));
+    setProgress(15 + (i/needClass.length)*35);
+    await sleep(400);
   }
 
-  // PASO 3 — TheAudioDB para los que siguen sin datos
+  // PASO 3 — TheAudioDB para los que MB encontró pero sin género, o no encontró
   const needTADB = results.filter(a => a.source === 'none');
-  setLoadingText(`TheAudioDB: 0/${needTADB.length}...`);
   for (let i = 0; i < needTADB.length; i++) {
     const a = needTADB[i];
     setLoadingText(`TheAudioDB: ${a.name} (${i+1}/${needTADB.length})`);
-    setProgress(60 + (i / Math.max(needTADB.length,1)) * 25);
-    const hit = await tadbLookup(a.name);
-    if (hit) { a.gender = hit.gender; a.source = hit.source; }
-    await sleep(200);
+    setProgress(50 + (i/Math.max(needTADB.length,1))*30);
+    const hit   = await tadbLookup(a.name);
+    a.tadbFound   = !!hit?.found;
+    a.tadbHasData = !!hit?.hasData;
+    if (hit?.hasData) {
+      a.gender = hit.gender; a.type = hit.type; a.source = 'TheAudioDB';
+    }
+    await sleep(150);
   }
 
-  // PASO 4 — Fallback por nombre
+  // PASO 4 — Fallback nombre
   for (const a of results) {
     if (a.source === 'none') {
       const g = inferByName(a.name);
-      if (g !== 'unknown') { a.gender = g; a.source = 'nombre'; }
+      if (g === 'group') { a.gender='group'; a.type='group'; a.source='nombre'; }
+      else if (g !== 'unknown') { a.gender=g; a.type='solo'; a.source='nombre'; }
+    }
+  }
+
+  // Para grupos sin composición, poner composition unknown
+  for (const a of results) {
+    if (a.type === 'group' && (!a.composition || a.composition === 'unknown')) {
+      a.composition = 'unknown';
+      if (a.gender === 'group') a.gender = 'group'; // mantener
     }
   }
 
@@ -765,19 +816,19 @@ async function classifyAll(artists) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FALLBACK POR NOMBRE
+// FALLBACK NOMBRE
 // ─────────────────────────────────────────────────────────────────────────────
 const FEMALE_NAMES = new Set(['taylor','adele','beyoncé','beyonce','rihanna','billie','ariana','selena','dua','olivia','miley','camila','demi','nicki','cardi','lizzo','sia','lorde','lana','halsey','kesha','katy','bebe','ava','clairo','sza','tinashe','ella','jessie','charli','amy','alicia','nina','diana','sarah','jennifer','jessica','emily','grace','aurora','paloma','rosalía','rosalia','ana','maria','paula','valentina','sofia','claudia','laura','marta','elena','sara','alba','carmen','lucía','lucia','pilar','teresa','rosa','patricia','natalia','andrea','mónica','monica','susana','cristina','sandra','eva','virginia','irene','beatriz','noa','amaia','ruth','leire','aitana','malú','malu','india','vanessa','shakira','grimes','lykke','feist','björk','bjork','imogen','fka','solange','kelela','sevdaliza','mitski','weyes','phoebe','caroline','yeule','oklou','shygirl','arca','sophie','angèle','angele','pomme','clara','camille','hoshi','jain','aya','yseult','lous','fatoumata','erykah','lauryn','jill','jazmine','ledisi','ciara','ashanti','brandy','monica','kacey','maren','miranda','carrie','dolly','emmylou','loretta','tammy','shania','faith','martina','trisha','wynonna','reba','norah','joni','sheryl','alanis','fiona','tori','enya','sinead','natalie','jewel','melissa','avril','pink','gwen','hayley','kelly','christina','mandy','hilary','britney','janet','gloria','cyndi','donna','cher','aretha','tina','janis','patti','bonnie','linda','karen','debbie','alice','kate','emma','julia','anna','lisa','mary','helen','elizabeth','claire','rachel','rebecca','hannah','sophia','barbara','susan','dorothy','betty','sharon','heather','amber','megan','tiffany','lauren','samantha','ashley','stephanie','nicole','victoria','anne','doja','mahalia','jorja','birdy']);
-const MALE_NAMES = new Set(['ed','drake','eminem','kanye','jay','kendrick','travis','post','lil','juice','tyler','frank','childish','chance','mac','asap','tupac','nas','snoop','ice','dre','rakim','common','mos','talib','andre','ludacris','nelly','usher','trey','chris','miguel','sam','shawn','charlie','harry','niall','louis','zayn','liam','john','paul','george','ringo','mick','keith','david','bruce','prince','michael','bob','james','ray','elvis','chuck','jerry','freddie','roger','pete','dave','jimmy','jimi','eric','tom','don','neil','elton','billy','barry','randy','warren','peter','simon','ryan','adam','luke','alan','mark','matt','nick','ian','noel','damon','thom','morrissey','robert','bono','sting','phil','ozzy','tony','lemmy','slash','axl','duff','steven','bobby','tommy','joey','dee','marky','johnny','sid','joe','pablo','juan','carlos','jose','antonio','francisco','manuel','jorge','alejandro','pedro','rafael','sergio','mario','fernando','roberto','enrique','raúl','raul','marc','joan','jordi','pau','gerard','abel','wos','bizarrap','duki','lit','trueno','rusherking','moby','skrillex','diplo','flume','kaytranada','aphex','burial','squarepusher','tricky','sufjan','bon','iron','jon','mura','sohn','tame','kevin','colin','ben','alex','daniel','julian','albert','nikolai','fabrizio','cal','jack','brendon','gerard','mikey','patrick','pete','andy','mac','rob','remi','wolf','omar','syd','steve']);
+const MALE_NAMES = new Set(['ed','drake','eminem','kanye','jay','kendrick','travis','post','lil','juice','tyler','frank','childish','chance','mac','asap','tupac','nas','snoop','ice','dre','rakim','common','mos','talib','andre','ludacris','nelly','usher','trey','chris','miguel','sam','shawn','charlie','harry','niall','louis','zayn','liam','john','paul','george','ringo','mick','keith','david','bruce','prince','michael','bob','james','ray','elvis','chuck','jerry','freddie','roger','pete','dave','jimmy','jimi','eric','tom','don','neil','elton','billy','barry','randy','warren','peter','simon','ryan','adam','luke','alan','mark','matt','nick','ian','noel','damon','thom','morrissey','robert','bono','sting','phil','ozzy','tony','lemmy','slash','axl','duff','steven','bobby','tommy','joey','dee','marky','johnny','sid','joe','pablo','juan','carlos','jose','antonio','francisco','manuel','jorge','alejandro','pedro','rafael','sergio','mario','fernando','roberto','enrique','raúl','raul','marc','joan','jordi','pau','gerard','abel','wos','bizarrap','duki','lit','trueno','rusherking','moby','skrillex','diplo','flume','kaytranada','aphex','burial','squarepusher','tricky','sufjan','bon','iron','jon','mura','sohn','tame','kevin','colin','ben','alex','daniel','julian','albert','nikolai','fabrizio','cal','jack','brendon','mikey','patrick','andy','rob','remi','wolf','omar','syd','steve']);
 
 function inferByName(name) {
   const lower = name.toLowerCase().trim();
   const groupIndicators = [' & ',' and ',' y ',' feat ',' vs ',' x ','/','trio','quartet','orchestra','ensemble','choir','band','brothers','sisters','boys','girls','crew','collective','experience','sound','machine'];
   for (const ind of groupIndicators) { if (lower.includes(ind)) return 'group'; }
   const tokens = lower.split(/[\s\-_\.]+/);
-  for (const t of [tokens[0], ...tokens]) {
+  for (const t of [tokens[0],...tokens]) {
     if (FEMALE_NAMES.has(t)) return 'female';
-    if (MALE_NAMES.has(t)) return 'male';
+    if (MALE_NAMES.has(t))   return 'male';
   }
   return 'unknown';
 }
@@ -786,130 +837,337 @@ function inferByName(name) {
 // RENDER
 // ─────────────────────────────────────────────────────────────────────────────
 function renderResults(classified) {
-  const total = classified.length;
-  const counts = {};
-  GENDER_ORDER.forEach(g => counts[g] = 0);
-  classified.forEach(a => counts[a.gender] = (counts[a.gender]||0) + 1);
+  renderCharts(classified);
+  renderArtistList(classified);
+  el('legendEl').classList.add('on');
+  el('resultsEl').classList.add('on');
+}
 
-  // Numbers
+function renderCharts(classified) {
+  const total = classified.length;
+
+  if (chartView === 'separate') {
+    renderSeparateCharts(classified, total);
+  } else {
+    renderCombinedCharts(classified, total);
+  }
+}
+
+function renderSeparateCharts(classified, total) {
+  // Separado: solistas por género + grupos por composición
+  const soloists  = classified.filter(a => a.type !== 'group');
+  const groups    = classified.filter(a => a.type === 'group');
+
+  const soloCounts = {};
+  GENDER_ORDER.filter(g => g !== 'group').forEach(g => soloCounts[g] = 0);
+  soloists.forEach(a => soloCounts[a.gender] = (soloCounts[a.gender]||0) + 1);
+
+  const compCounts = {};
+  Object.keys(COMPOSITION_CFG).forEach(c => compCounts[c] = 0);
+  groups.forEach(a => compCounts[a.composition||'unknown'] = (compCounts[a.composition||'unknown']||0) + 1);
+
   const grid = el('numbersGrid');
   grid.innerHTML = '';
-  GENDER_ORDER.filter(g => counts[g] > 0).forEach(g => {
-    const { label, color } = GENDER_CFG[g];
-    const pct = Math.round(counts[g] / total * 100);
-    const cell = document.createElement('div');
-    cell.className = 'num-cell';
-    cell.innerHTML = `<div class="num-big" style="color:${color}">${pct}%</div><div class="num-label">${label}</div><div class="num-count">${counts[g]} artista${counts[g]!==1?'s':''}</div>`;
-    grid.appendChild(cell);
-  });
 
-  // Bars
+  // Solistas
+  GENDER_ORDER.filter(g => g!=='group' && soloCounts[g]>0).forEach(g => {
+    const { label,color } = GENDER_CFG[g];
+    const pct = Math.round(soloCounts[g]/Math.max(soloists.length,1)*100);
+    addNumCell(grid, pct+'%', label, soloCounts[g]+' solista'+(soloCounts[g]!==1?'s':''), color);
+  });
+  // Grupos
+  if (groups.length) {
+    Object.entries(compCounts).filter(([,c])=>c>0).forEach(([comp,count]) => {
+      const { label,color } = COMPOSITION_CFG[comp];
+      const pct = Math.round(count/groups.length*100);
+      addNumCell(grid, pct+'%', label, count+' grupo'+(count!==1?'s':''), color);
+    });
+  }
+
   const bars = el('barsContainer');
   bars.innerHTML = '';
-  GENDER_ORDER.filter(g => counts[g] > 0).forEach(g => {
-    const { label, color } = GENDER_CFG[g];
-    const pct = Math.round(counts[g] / total * 100);
-    const row = document.createElement('div');
-    row.className = 'bar-row';
-    row.innerHTML = `<span class="bar-label">${label}</span><div class="bar-track"><div class="bar-fill" id="bar-${g}" style="background:${color}"></div></div><span class="bar-pct" style="color:${color}">${pct}%</span>`;
-    bars.appendChild(row);
+
+  if (soloists.length) {
+    const t = document.createElement('div');
+    t.className = 'bar-section-title';
+    t.textContent = `Solistas (${soloists.length})`;
+    bars.appendChild(t);
+    GENDER_ORDER.filter(g => g!=='group' && soloCounts[g]>0).forEach(g => {
+      const { label,color } = GENDER_CFG[g];
+      addBarRow(bars, label, Math.round(soloCounts[g]/soloists.length*100), color, 'bs-'+g);
+    });
+  }
+
+  if (groups.length) {
+    const div = document.createElement('div');
+    div.className = 'bars-divider';
+    bars.appendChild(div);
+    const t = document.createElement('div');
+    t.className = 'bar-section-title';
+    t.textContent = `Grupos / Bandas (${groups.length})`;
+    bars.appendChild(t);
+    Object.entries(compCounts).filter(([,c])=>c>0).forEach(([comp,count]) => {
+      const { label,color } = COMPOSITION_CFG[comp];
+      addBarRow(bars, label, Math.round(count/groups.length*100), color, 'bc-'+comp);
+    });
+  }
+
+  setTimeout(() => animateBars(soloists, groups, soloCounts, compCounts), 80);
+}
+
+function animateBars(soloists, groups, soloCounts, compCounts) {
+  GENDER_ORDER.forEach(g => {
+    const b = document.getElementById('bs-'+g);
+    if (b) b.style.width = Math.round((soloCounts[g]||0)/Math.max(soloists.length,1)*100)+'%';
+  });
+  Object.keys(COMPOSITION_CFG).forEach(c => {
+    const b = document.getElementById('bc-'+c);
+    if (b) b.style.width = Math.round((compCounts[c]||0)/Math.max(groups.length,1)*100)+'%';
+  });
+}
+
+function renderCombinedCharts(classified, total) {
+  // Combinado: grupos suman según composición al género correspondiente
+  const counts = {};
+  GENDER_ORDER.forEach(g => counts[g] = 0);
+
+  for (const a of classified) {
+    if (a.type !== 'group') {
+      counts[a.gender] = (counts[a.gender]||0) + 1;
+    } else {
+      // Mapear composición a género
+      const compToGender = { 'majority-female':'female','majority-male':'male','mixed':'group','majority-nb':'non-binary','unknown':'unknown' };
+      const g = compToGender[a.composition||'unknown'] || 'group';
+      counts[g] = (counts[g]||0) + 1;
+    }
+  }
+
+  const grid = el('numbersGrid');
+  grid.innerHTML = '';
+  GENDER_ORDER.filter(g => counts[g]>0).forEach(g => {
+    const { label,color } = GENDER_CFG[g];
+    const pct = Math.round(counts[g]/total*100);
+    addNumCell(grid, pct+'%', label, counts[g]+' artista'+(counts[g]!==1?'s':''), color);
+  });
+
+  const bars = el('barsContainer');
+  bars.innerHTML = '';
+  GENDER_ORDER.filter(g => counts[g]>0).forEach(g => {
+    const { label,color } = GENDER_CFG[g];
+    addBarRow(bars, label, Math.round(counts[g]/total*100), color, 'bc2-'+g);
   });
   setTimeout(() => {
-    GENDER_ORDER.forEach(g => { const b = document.getElementById('bar-'+g); if (b) b.style.width = Math.round(counts[g]/total*100)+'%'; });
+    GENDER_ORDER.forEach(g => {
+      const b = document.getElementById('bc2-'+g);
+      if (b) b.style.width = Math.round((counts[g]||0)/total*100)+'%';
+    });
   }, 80);
+}
 
-  // Artist list
+function addNumCell(parent, big, label, count, color) {
+  const cell = document.createElement('div');
+  cell.className = 'num-cell';
+  cell.innerHTML = `<div class="num-big" style="color:${color}">${big}</div><div class="num-label">${label}</div><div class="num-count">${count}</div>`;
+  parent.appendChild(cell);
+}
+
+function addBarRow(parent, label, pct, color, id) {
+  const row = document.createElement('div');
+  row.className = 'bar-row';
+  row.innerHTML = `<span class="bar-label">${label}</span><div class="bar-track"><div class="bar-fill" id="${id}" style="background:${color}"></div></div><span class="bar-pct" style="color:${color}">${pct}%</span>`;
+  parent.appendChild(row);
+}
+
+function renderArtistList(classified) {
   const list = el('artistList');
   list.innerHTML = '';
-  el('artistsTitle').textContent = currentTab === 'liked' ? `${total} artistas únicos en me gusta` : `Top ${total} artistas`;
+  el('artistsTitle').textContent = currentTab==='liked' ? `${classified.length} artistas únicos en me gusta` : `Top ${classified.length} artistas`;
 
   classified.forEach((a, idx) => {
-    const { color, label } = GENDER_CFG[a.gender] || GENDER_CFG.unknown;
-    const sourceLabel = {
-      'MusicBrainz': 'MusicBrainz',
-      'TheAudioDB':  'TheAudioDB',
-      'community':   '✓ comunidad',
-      'nombre':      '★ nombre',
-      'none':        '—',
-    }[a.source] || a.source;
-    const isInferred  = a.source === 'nombre';
-    const isCommunity = a.source === 'community';
+    const gCfg    = GENDER_CFG[a.gender]    || GENDER_CFG.unknown;
+    const compCfg = COMPOSITION_CFG[a.composition] || COMPOSITION_CFG.unknown;
+    const needsEdit = a.source === 'none' || a.gender === 'unknown';
 
     const row = document.createElement('div');
-    row.className = 'artist-row';
-    row.style.borderLeftColor = color;
-    row.dataset.idx = idx;
+    row.className = 'artist-row' + (needsEdit?' needs-edit':'');
+    row.id = 'artist-row-'+idx;
+
+    // Tipo tag siempre visible
+    const typeLabel = a.type === 'group' ? 'Grupo/Banda' : 'Solista';
+
+    // Tags
+    let tagsHtml = `<div class="tags">`;
+    tagsHtml += `<span class="tag type">${typeLabel}</span>`;
+    if (a.type === 'group') {
+      tagsHtml += `<span class="tag gender" style="color:${compCfg.color};border-color:${compCfg.color}">${compCfg.label}</span>`;
+    } else {
+      tagsHtml += `<span class="tag gender" style="color:${gCfg.color};border-color:${gCfg.color}">${gCfg.label}</span>`;
+    }
+    tagsHtml += `</div>`;
+
+    // Source pills — mostrar ambas fuentes, resaltar la que dio el dato
+    const mbClass  = a.source==='MusicBrainz' ? 'hit' : (a.mbFound ? '' : '');
+    const tadbClass= a.source==='TheAudioDB'  ? 'hit' : (a.tadbFound ? '' : '');
+    const mbShow   = a.mbFound || a.source==='MusicBrainz';
+    const tadbShow = a.tadbFound || a.source==='TheAudioDB';
+
+    let sourcesHtml = `<div class="sources">`;
+    if (a.source === 'community') {
+      sourcesHtml += `<span class="src-pill community">✓ comunidad</span>`;
+    } else if (a.source === 'nombre') {
+      sourcesHtml += `<span class="src-pill inferred">★ nombre</span>`;
+    } else {
+      if (mbShow)   sourcesHtml += `<span class="src-pill ${mbClass}">MB</span>`;
+      if (tadbShow) sourcesHtml += `<span class="src-pill ${tadbClass}">TADB</span>`;
+      if (!mbShow && !tadbShow) sourcesHtml += `<span class="src-pill">—</span>`;
+    }
+    sourcesHtml += `</div>`;
+
+    const borderColor = a.type==='group' ? compCfg.color : gCfg.color;
+
+    row.style.borderLeftColor = needsEdit ? 'var(--muted)' : borderColor;
     row.innerHTML = `
       ${a.image ? `<img class="artist-thumb" src="${a.image}" alt="" onerror="this.style.display='none'">` : `<div class="artist-thumb-empty"></div>`}
       <span class="artist-name">${esc(a.name)}</span>
-      <span class="artist-source-pill${isInferred?' inferred':isCommunity?' airtable':''}" title="Fuente: ${sourceLabel}">${sourceLabel}</span>
-      <span class="artist-tag" style="color:${color};border-color:${color}">${label}</span>
-      <button class="btn-edit" onclick="openEdit(${idx})">editar</button>`;
+      ${sourcesHtml}
+      ${tagsHtml}
+      <button class="btn-edit" onclick="openEditSingle(${idx})">editar</button>`;
     list.appendChild(row);
   });
 
-  el('legendEl').classList.add('on');
-  el('resultsEl').classList.add('on');
-  el('resultsEl').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Actualizar botón "Corregir sin datos"
+  editQueue = classified.map((_,i)=>i).filter(i => classified[i].gender==='unknown' || classified[i].source==='none');
+  el('editAllBtn').textContent = `Corregir sin datos (${editQueue.length}) →`;
+  el('editAllBtn').style.display = editQueue.length ? 'block' : 'none';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODAL EDICIÓN
 // ─────────────────────────────────────────────────────────────────────────────
-function openEdit(idx) {
-  editingArtist  = currentResults[idx];
-  selectedGender = editingArtist.gender;
+function onTypeChange() {
+  const isGroup = el('selectType').value === 'group';
+  el('compositionSection').classList.toggle('on', isGroup);
+  // Si es grupo, deshabilitar select de género individual
+  el('selectGender').disabled = isGroup;
+  el('selectGender').style.opacity = isGroup ? '.4' : '1';
+}
 
-  el('modalArtistName').textContent = editingArtist.name;
+function openEdit(idx, queue, queuePos) {
+  const a = currentResults[idx];
+  editQueue    = queue;
+  editQueuePos = queuePos;
 
-  const opts = el('genderOptions');
-  opts.innerHTML = '';
-  GENDER_ORDER.forEach(g => {
-    const { label, color } = GENDER_CFG[g];
-    const btn = document.createElement('button');
-    btn.className = 'gender-opt' + (g === selectedGender ? ' selected' : '');
-    btn.textContent = label;
-    if (g === selectedGender) { btn.style.background = color; btn.style.borderColor = color; }
-    btn.onclick = () => {
-      selectedGender = g;
-      document.querySelectorAll('.gender-opt').forEach(b => { b.classList.remove('selected'); b.style.background = ''; b.style.borderColor = ''; });
-      btn.classList.add('selected');
-      btn.style.background = color;
-      btn.style.borderColor = color;
-    };
-    opts.appendChild(btn);
-  });
+  el('modalNav').textContent = `Artista ${queuePos+1} de ${queue.length} sin datos`;
+  el('modalArtistName').textContent = a.name;
+  el('selectType').value        = a.type || 'solo';
+  el('selectGender').value      = a.gender || 'unknown';
+  el('selectComposition').value = a.composition || 'unknown';
+  onTypeChange();
 
+  el('btnSave').textContent = queuePos < queue.length-1 ? 'Guardar y siguiente' : 'Guardar y cerrar';
   el('modalOverlay').classList.add('on');
+}
+
+function openEditSingle(idx) {
+  openEdit(idx, [idx], 0);
+  el('modalNav').textContent = currentResults[idx].name;
+  el('btnSave').textContent  = 'Guardar';
+}
+
+function startEditQueue() {
+  if (!editQueue.length) return;
+  editQueuePos = 0;
+  openEdit(editQueue[0], editQueue, 0);
+}
+
+function skipEdit() {
+  const nextPos = editQueuePos + 1;
+  if (nextPos < editQueue.length) {
+    openEdit(editQueue[nextPos], editQueue, nextPos);
+  } else {
+    closeModal();
+  }
+}
+
+async function saveEdit() {
+  const idx = editQueue[editQueuePos];
+  const a   = currentResults[idx];
+  const type        = el('selectType').value;
+  const gender      = type === 'group' ? 'group' : el('selectGender').value;
+  const composition = type === 'group' ? el('selectComposition').value : '';
+
+  // Actualizar en memoria sin re-renderizar toda la lista
+  a.type        = type;
+  a.gender      = gender;
+  a.composition = composition;
+  a.source      = 'community';
+  a.verified    = true;
+
+  // Actualizar solo esa fila
+  updateArtistRow(idx);
+
+  // Guardar en Airtable (async, sin bloquear)
+  saveToAirtable(a.name, type, gender, composition);
+
+  // Actualizar gráficos
+  renderCharts(currentResults);
+
+  // Avanzar en la queue
+  const nextPos = editQueuePos + 1;
+  if (nextPos < editQueue.length && editQueue.length > 1) {
+    // Remover el editado de la queue
+    editQueue.splice(editQueuePos, 1);
+    if (editQueuePos < editQueue.length) {
+      openEdit(editQueue[editQueuePos], editQueue, editQueuePos);
+    } else {
+      closeModal();
+    }
+  } else {
+    editQueue = editQueue.filter(i => currentResults[i].gender==='unknown' || currentResults[i].source==='none');
+    closeModal();
+  }
+}
+
+function updateArtistRow(idx) {
+  const a    = currentResults[idx];
+  const row  = document.getElementById('artist-row-'+idx);
+  if (!row) return;
+
+  const gCfg    = GENDER_CFG[a.gender]    || GENDER_CFG.unknown;
+  const compCfg = COMPOSITION_CFG[a.composition] || COMPOSITION_CFG.unknown;
+  const typeLabel = a.type==='group' ? 'Grupo/Banda' : 'Solista';
+  const borderColor = a.type==='group' ? compCfg.color : gCfg.color;
+
+  row.style.borderLeftColor = borderColor;
+  row.classList.remove('needs-edit');
+
+  // Actualizar tags
+  const tagsEl = row.querySelector('.tags');
+  if (tagsEl) {
+    tagsEl.innerHTML = `
+      <span class="tag type">${typeLabel}</span>
+      ${a.type==='group'
+        ? `<span class="tag gender" style="color:${compCfg.color};border-color:${compCfg.color}">${compCfg.label}</span>`
+        : `<span class="tag gender" style="color:${gCfg.color};border-color:${gCfg.color}">${gCfg.label}</span>`}`;
+  }
+
+  // Actualizar source pill
+  const srcEl = row.querySelector('.sources');
+  if (srcEl) srcEl.innerHTML = `<span class="src-pill community">✓ comunidad</span>`;
+
+  // Actualizar botón editar — actualizar label del queue
+  editQueue = currentResults.map((_,i)=>i).filter(i => currentResults[i].gender==='unknown' || currentResults[i].source==='none');
+  el('editAllBtn').textContent = `Corregir sin datos (${editQueue.length}) →`;
+  el('editAllBtn').style.display = editQueue.length ? 'block' : 'none';
 }
 
 function closeModal() {
   el('modalOverlay').classList.remove('on');
-  editingArtist  = null;
-  selectedGender = null;
-}
-
-async function saveEdit() {
-  if (!editingArtist || !selectedGender) return;
-
-  const saved = await saveToAirtable(editingArtist.name, selectedGender, 'manual');
-
-  // Actualizar en currentResults
-  const idx = currentResults.indexOf(editingArtist);
-  if (idx >= 0) {
-    currentResults[idx].gender  = selectedGender;
-    currentResults[idx].source  = 'community';
-    currentResults[idx].verified = true;
-  }
-
-  closeModal();
-  renderResults(currentResults);
-
-  if (!saved) showError('No se pudo guardar en la base de datos, pero se actualizó localmente.');
+  editQueue = [];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ADMIN PANEL
+// ADMIN
 // ─────────────────────────────────────────────────────────────────────────────
 async function openAdmin() {
   el('resultsEl').classList.remove('on');
@@ -919,71 +1177,58 @@ async function openAdmin() {
   el('topFilters').classList.remove('on');
   el('analyzeBtn').classList.remove('on');
   el('adminPanel').classList.add('on');
-
-  // Cargar datos frescos
-  setLoadingText('Cargando base de datos...');
-  showLoading('Cargando datos de Airtable...');
-
+  showLoading('Cargando Airtable...');
   try {
     const records = [];
     let offset = null;
     do {
       const url = new URL(AT_URL);
-      url.searchParams.set('pageSize', '100');
-      url.searchParams.set('sort[0][field]', 'added_at');
-      url.searchParams.set('sort[0][direction]', 'desc');
+      url.searchParams.set('pageSize','100');
+      url.searchParams.set('sort[0][field]','added_at');
+      url.searchParams.set('sort[0][direction]','desc');
       if (offset) url.searchParams.set('offset', offset);
-      const r   = await fetch(url, { headers: AT_HEADERS });
+      const r    = await fetch(url, { headers:AT_HEADERS });
       const data = await r.json();
-      records.push(...(data.records || []));
+      records.push(...(data.records||[]));
       offset = data.offset;
     } while (offset);
-
     hideLoading();
-
-    const verified = records.filter(r => r.fields.verified).length;
-    const unknown  = records.filter(r => r.fields.gender === 'unknown' || !r.fields.gender).length;
     el('adminTotal').textContent    = records.length;
-    el('adminVerified').textContent = verified;
-    el('adminUnknown').textContent  = unknown;
-
+    el('adminVerified').textContent = records.filter(r=>r.fields.verified).length;
+    el('adminUnknown').textContent  = records.filter(r=>!r.fields.gender||r.fields.gender==='unknown').length;
     const tbody = el('adminTableBody');
     tbody.innerHTML = '';
     records.forEach(rec => {
-      const f = rec.fields;
-      const { color } = GENDER_CFG[f.gender] || GENDER_CFG.unknown;
+      const f  = rec.fields;
+      const gc = GENDER_CFG[f.gender]||GENDER_CFG.unknown;
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${esc(f.name || '—')}</td>
-        <td><span style="color:${color}">${GENDER_CFG[f.gender]?.label || f.gender || '—'}</span></td>
-        <td style="color:var(--muted);font-size:10px">${esc(f.source || '—')}</td>
-        <td style="text-align:center">${f.verified ? '✓' : ''}</td>
-        <td style="color:var(--muted);font-size:10px">${f.added_at || '—'}</td>
-        <td><button class="admin-delete" onclick="adminDelete('${rec.id}','${esc(f.name||'')}',this)">borrar</button></td>`;
+        <td>${esc(f.name||'—')}</td>
+        <td style="color:var(--muted);font-size:10px">${f.type||'—'}</td>
+        <td><span style="color:${gc.color}">${gc.label}</span></td>
+        <td style="color:var(--muted);font-size:10px">${esc(f.source||'—')}</td>
+        <td style="text-align:center">${f.verified?'✓':''}</td>
+        <td style="color:var(--muted);font-size:10px">${f.added_at||'—'}</td>
+        <td><button class="btn-del" onclick="adminDelete('${rec.id}','${esc(f.name||'')}',this)">borrar</button></td>`;
       tbody.appendChild(tr);
     });
-
-  } catch(e) {
-    hideLoading();
-    showError('Error al cargar Airtable: ' + e.message);
-  }
+  } catch(e) { hideLoading(); showError('Error Airtable: '+e.message); }
 }
 
 function closeAdmin() {
   el('adminPanel').classList.remove('on');
   el('tabs').classList.add('on');
   el('analyzeBtn').classList.add('on');
-  el('likedFilters').classList.toggle('on', currentTab === 'liked');
-  el('topFilters').classList.toggle('on', currentTab === 'top');
+  el('likedFilters').classList.toggle('on', currentTab==='liked');
+  el('topFilters').classList.toggle('on', currentTab==='top');
   if (currentResults.length) { el('resultsEl').classList.add('on'); el('legendEl').classList.add('on'); }
 }
 
 async function adminDelete(recordId, name, btn) {
-  btn.disabled = true;
-  btn.textContent = '...';
+  btn.disabled = true; btn.textContent = '...';
   const ok = await deleteFromAirtable(recordId, name);
   if (ok) btn.closest('tr').remove();
-  else { btn.disabled = false; btn.textContent = 'borrar'; }
+  else { btn.disabled=false; btn.textContent='borrar'; }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -991,11 +1236,11 @@ async function adminDelete(recordId, name, btn) {
 // ─────────────────────────────────────────────────────────────────────────────
 function el(id) { return document.getElementById(id); }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function showLoading(msg) { el('loadingText').textContent = msg; el('loadingEl').classList.add('on'); el('analyzeBtn').disabled = true; }
-function setLoadingText(t) { el('loadingText').textContent = t; }
-function setProgress(p) { el('progressFill').style.width = Math.min(p,100)+'%'; }
-function hideLoading() { el('loadingEl').classList.remove('on'); el('analyzeBtn').disabled = false; }
-function showError(msg) { el('errorBox').textContent = msg; el('errorBox').classList.add('on'); }
+function showLoading(msg) { el('loadingText').textContent=msg; el('loadingEl').classList.add('on'); el('analyzeBtn').disabled=true; }
+function setLoadingText(t) { el('loadingText').textContent=t; }
+function setProgress(p) { el('progressFill').style.width=Math.min(p,100)+'%'; }
+function hideLoading() { el('loadingEl').classList.remove('on'); el('analyzeBtn').disabled=false; }
+function showError(msg) { el('errorBox').textContent=msg; el('errorBox').classList.add('on'); }
 function hideError() { el('errorBox').classList.remove('on'); }
 </script>
 </body>
